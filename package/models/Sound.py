@@ -1,6 +1,8 @@
 from .SoundSample import SoundSample
 import wave
 import simpleaudio as sa
+import pygame
+import threading
 
 class Sound:
     MAX_NEG = -32768
@@ -43,16 +45,19 @@ class Sound:
         """
         if isinstance(sound, str):
             self.filename = sound
+            self.lock = threading.Lock()
+            self.is_playing = False
             waveRead = wave.open(self.filename, 'rb')
             self.numFrames = waveRead.getnframes()
             self.numChannels = waveRead.getnchannels()
             self.sampleWidth = waveRead.getsampwidth()
             self.sampleRate = waveRead.getframerate()
             self.buffer = bytearray(waveRead.readframes(self.numFrames))
-            waveRead.close()
         elif isinstance(sound, int):
             self.filename = ''
             self.numFrames = sound
+            self.lock = threading.Lock()
+            self.is_playing = False
             self.numChannels = 1
             self.sampleWidth = int(self.NUM_BITS_PER_SAMPLE / 8)
             self.sampleRate = sampleRate
@@ -61,10 +66,15 @@ class Sound:
         elif isinstance(sound, Sound):
             self.filename = sound.filename
             self.numFrames = sound.numFrames
+            self.lock = threading.Lock()
+            self.is_playing = False
             self.numChannels = sound.numChannels
             self.sampleWidth = sound.sampleWidth
             self.sampleRate = sound.sampleRate
             self.buffer = sound.buffer.copy()
+        size = int(8 * self.sampleWidth)
+        pygame.mixer.init(frequency = self.sampleRate, size = size, channels = self.numChannels)
+        self.soundMix = pygame.mixer.Sound(self.filename)
         self.playbacks = []
 
     def __str__(self):
@@ -158,16 +168,6 @@ class Sound:
         """
         return self.filename
 
-    def getFileName(self):
-        """Return sounds file name
-
-        Returns
-        -------
-        string
-            name of associated file
-        """
-        return self.filename
-
     def getFrame(self, frameNum):
         """Obtains all the data from a specified frame in the audio data
 
@@ -235,6 +235,18 @@ class Sound:
         waveObject = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
         self.playbacks.append(waveObject.play())
 
+    def playMix(self):
+        self.soundMix.play()
+
+    def blockingPlayMix(self):
+        with self.lock:
+            if self.is_playing:
+                return
+        self.is_playing = True
+        self.soundMix.play()
+        pygame.time.wait(int(self.soundMix.get_length() * 1000))
+        self.is_playing = False
+
     def explore(self):
         """Open a sound explorer on a copy of this sound
         """
@@ -258,11 +270,19 @@ class Sound:
         # except Exception:
         #     print("Couldn't covert the file {}".format(mp3File))
 
+    # def blockingPlay(self):
+    #     """Play a sound - blocking
+    #     """
+    #     self.play()
+    #     self.playbacks[-1].wait_done()
+    
     def blockingPlay(self):
-        """Play a sound - blocking
-        """
-        self.play()
-        self.playbacks[-1].wait_done()
+        try:
+            wave = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
+            playback = wave.play()
+            playback.wait_done()
+        except Exception as e:
+            print("Playback error:", e)
 
     def stopPlaying(self):
         """Stop playback of all currently playing sounds

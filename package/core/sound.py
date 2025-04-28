@@ -1,3 +1,4 @@
+import threading
 import os, random, time
 import pygame.midi
 from ..models.Sound import Sound
@@ -5,6 +6,7 @@ from ..models.Sample import Sample
 from ..models.Samples import Samples
 from .utils import getShortPath
 import matplotlib.pyplot as plt
+import tkinter as tk
 
 def samplesToSound(samples):
     maxIndex = max([getIndex(s) for s in samples])
@@ -70,6 +72,12 @@ def blockingPlay(sound):
         print("blockingPlay(sound): Input is not a sound")
         raise ValueError
     sound.blockingPlay()
+
+def threadedPlay(sound):
+    if not isinstance(sound, Sound):
+        print("threadedPlay(sound): Input is not a sound")
+        raise ValueError
+    threading.Thread(target = lambda: sound.blockingPlayMix(), daemon = True).start()
 
 
 def stopPlaying(sound):
