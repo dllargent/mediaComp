@@ -23,7 +23,7 @@ def chooseColor():
         data.SetChooseAlpha(False)
     data.SetChooseFull(True)
     data.SetColour(wx.WHITE) # show colors on initial color wheel on mac
-
+    
     # start and process the dialog
     color = None
     dlg = wx.ColourDialog(wx.GetApp().GetTopWindow(), data)
