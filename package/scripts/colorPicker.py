@@ -15,8 +15,8 @@ def chooseColor():
     Returns:
         RGB tuple or None.
     """
-    app = wx.App()
-
+    app = wx.App(False)
+    frame = wx.Frame(None)
     # setup defaults
     data = wx.ColourData()
     if wx.Platform == "__WXMAC__":
