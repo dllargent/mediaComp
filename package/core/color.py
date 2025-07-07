@@ -24,7 +24,6 @@ def makeDarker(color):
         raise ValueError
     return Color(color.makeDarker())
 
-
 def makeLighter(color):
     if not isinstance(color, Color):
         print("makeLighter(color): Input is not a color")
