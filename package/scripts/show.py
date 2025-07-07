@@ -4,6 +4,45 @@ import wx
 import sys
 import pickle
 from threading import Thread
+import traceback
+import os
+
+# Add the package root directory to Python path
+script_dir = os.path.dirname(os.path.abspath(__file__))  # scripts directory
+package_dir = os.path.dirname(script_dir)  # package directory
+parent_dir = os.path.dirname(package_dir)  # directory containing package
+
+# Add both the parent directory and package directory to path
+for path in [parent_dir, package_dir]:
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
+# Try to import the package module - try multiple import strategies
+package_imported = False
+try:
+    from package import *
+    package_imported = True
+except ImportError:
+    try:
+        # Try importing from package root
+        sys.path.insert(0, package_dir)
+        from package.core import *
+        from package.models import *
+        package_imported = True
+    except ImportError:
+        try:
+            # Try importing the specific modules
+            import package
+            from package.core import *
+            from package.models import *
+            package_imported = True
+        except ImportError as e:
+            print(f"Warning: Could not import package modules: {e}", file=sys.stderr)
+            print(f"Script directory: {script_dir}", file=sys.stderr)
+            print(f"Package directory: {package_dir}", file=sys.stderr)
+            print(f"Parent directory: {parent_dir}", file=sys.stderr)
+            print(f"Current working directory: {os.getcwd()}", file=sys.stderr)
+            print(f"Python path: {sys.path}", file=sys.stderr)
 
 
 class Listener(Thread):
@@ -13,85 +52,198 @@ class Listener(Thread):
         Thread.__init__(self)
         self.notifyWindow = notifyWindow
         self.daemon = True
+        self._running = True
         self.start()
 
     def run(self):
-        while True:
-            try:
-                # Blocking read: Wait until there's control byte data
-                control = sys.stdin.buffer.read(1)
-                if not control:
-                    # Blocked read and there is no control byte, keep waiting
-                    continue
+        try:
+            while self._running:
+                try:
+                    # Blocking read: Wait until there's control byte data
+                    control = sys.stdin.buffer.read(1)
+                    if not control:
+                        # EOF reached - program ended without sending shutdown signal
+                        wx.CallAfter(self.notifyWindow.on_program_ended)
+                        break
+                    
+                    if control == bytes([0]):
+                        wx.CallAfter(self.notifyWindow.on_shutdown)
+                        break
+                    elif control == bytes([1]):
+                        # Read the picture data size (next 8 bytes)
+                        size_bytes = sys.stdin.buffer.read(8)
+                        if len(size_bytes) < 8:
+                            print("Incomplete size data received", file=sys.stderr)
+                            break
+                        
+                        size = int.from_bytes(size_bytes, byteorder='big')
+                        
+                        if size == 0:
+                            continue
+                        
+                        # Read payload in chunks to handle large data
+                        payload = b''
+                        bytes_read = 0
+                        while bytes_read < size:
+                            chunk = sys.stdin.buffer.read(min(4096, size - bytes_read))
+                            if not chunk:
+                                print("Incomplete payload data received", file=sys.stderr)
+                                break
+                            payload += chunk
+                            bytes_read += len(chunk)
+                        
+                        if len(payload) == size:
+                            wx.CallAfter(self.notifyWindow.on_new_picture, payload)
+                        else:
+                            print(f"Payload size mismatch: expected {size}, got {len(payload)}", file=sys.stderr)
+                    else:
+                        print(f"Unexpected control byte: {control[0]}", file=sys.stderr)
+                        
+                except EOFError:
+                    print("EOF in listener thread - program ended", file=sys.stderr)
+                    wx.CallAfter(self.notifyWindow.on_program_ended)
+                    break
+                except Exception as e:
+                    print(f"Listener error: {e}", file=sys.stderr)
+                    traceback.print_exc(file=sys.stderr)
+                    break
+        finally:
+            print("Listener thread exiting", file=sys.stderr)
 
-                if control == bytes([0]):
-                    wx.CallAfter(self.notifyWindow.on_shutdown)
-                    return
-                elif control == bytes([1]):
-                    # Read the picture data size (next 8 bytes)
-                    size_bytes = sys.stdin.buffer.read(8)
-                    size = int.from_bytes(size_bytes, byteorder='big')
-                    if size == 0:
-                        continue
-                    payload = sys.stdin.buffer.read(size)
-                    wx.CallAfter(self.notifyWindow.on_new_picture, payload)
-                else:
-                    print("Unexpected control byte", file=sys.stderr)
-            except Exception as e:
-                print(f"Listener error: {e}", file=sys.stderr)
-                break
+    def stop(self):
+        self._running = False
 
 
 class MainWindow(wx.Frame):
     def __init__(self, parent=None):
-        super().__init__(parent=parent, title="Image Viewer", size=(400, 400))
+        # Create window with fixed size style (no resize)
+        super().__init__(parent=parent, title="Image Viewer", 
+                        style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
+        
         self.panel = wx.Panel(self)
         self.imageCtrl = None  # this will hold the image
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.panel.SetSizer(self.sizer)
 
+        # Add a placeholder label
+        self.placeholder = wx.StaticText(self.panel, label="Waiting for image...")
+        self.sizer.Add(self.placeholder, 0, wx.ALIGN_CENTER | wx.ALL, 10)
+
+        # Initial size for placeholder
+        self.SetClientSize((300, 100))
+        self.Center()
+
         self.listener = Listener(self)
 
+        # Bind close event to clean up properly
+        self.Bind(wx.EVT_CLOSE, self.on_close)
+
         self.Show()
+
+    def on_close(self, event):
+        if hasattr(self, 'listener'):
+            self.listener.stop()
+        event.Skip()
+
+    def on_program_ended(self):
+        # Don't close the window - just stop the listener
+        if hasattr(self, 'listener'):
+            self.listener.stop()
+        
+        # Update the title to indicate the program is done
+        current_title = self.GetTitle()
+        if not current_title.endswith(" - Complete"):
+            self.SetTitle(current_title + " - Complete")
+
+    def on_shutdown_signal(self):
+        # Don't close the window - just stop the listener
+        if hasattr(self, 'listener'):
+            self.listener.stop()
+        
+        # Optionally update the title to indicate the program is done
+        current_title = self.GetTitle()
+        if not current_title.endswith(" - Complete"):
+            self.SetTitle(current_title + " - Complete")
 
     def on_shutdown(self):
         self.Close()
 
     def on_new_picture(self, pickled_picture):
-        try:
+        try:            
+            # Try to unpickle the picture object
             picture = pickle.loads(pickled_picture)
             self.update_bitmap(picture)
+            
+        except ModuleNotFoundError as e:
+            print(f"ModuleNotFoundError during unpickling: {e}", file=sys.stderr)
+            print("This usually means the 'package' module cannot be found.", file=sys.stderr)
+            print("Make sure you're running from the correct directory.", file=sys.stderr)
+            
         except Exception as e:
             print(f"Error loading picture: {e}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
 
     def update_bitmap(self, picture):
-        wx_image = picture.getWxImage()
-        bitmap = wx.Bitmap(wx_image)
+        try:
+            wx_image = picture.getWxImage()
+            
+            bitmap = wx.Bitmap(wx_image)
 
-        # Clear old image
-        if self.imageCtrl:
-            self.imageCtrl.Destroy()
+            # Clear old content
+            self.sizer.Clear(True)
+            if self.imageCtrl:
+                self.imageCtrl.Destroy()
+                self.imageCtrl = None
+            if self.placeholder:
+                self.placeholder.Destroy()
+                self.placeholder = None
 
-        self.imageCtrl = wx.StaticBitmap(self.panel, bitmap=bitmap)
+            # Create new image control
+            self.imageCtrl = wx.StaticBitmap(self.panel, bitmap=bitmap)
+            
+            # Update window title
+            title = picture.getTitle() if hasattr(picture, 'getTitle') else "Image Viewer"
+            self.SetTitle(title)
 
-        # Update window title
-        self.SetTitle(picture.getTitle())
-
-        # Refit layout
-        self.sizer.Clear(True)
-        self.sizer.Add(self.imageCtrl, 0, wx.ALIGN_CENTER | wx.ALL, 10)
-        self.panel.Layout()
-        self.Fit()
-        self.Center()
+            # Add to sizer with no borders/padding for exact fit
+            self.sizer.Add(self.imageCtrl, 0, wx.ALIGN_CENTER, 0)
+            self.panel.Layout()
+            
+            # Calculate the exact size needed for the image
+            image_size = bitmap.GetSize()
+            
+            # Set the client size to exactly match the image size
+            self.SetClientSize(image_size)
+            
+            # Center the window on screen
+            self.Center()
+            
+        except Exception as e:
+            print(f"Error updating bitmap: {e}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
 
 
 def main():
+    # Check if package modules are available
+    modules_found = []
+    for module_name in ['package', 'package.core', 'package.models']:
+        if module_name in sys.modules:
+            modules_found.append(module_name)
+    
+    if not modules_found:
+        print("Warning: No package modules found in sys.modules", file=sys.stderr)
+    
+    # Check if we can access common functions
+    try:
+        if 'makePicture' not in globals():
+            print("Warning: makePicture function not found", file=sys.stderr)
+    except:
+        print("Warning: Cannot check for makePicture function", file=sys.stderr)
+    
     app = wx.App(False)
-    frame = MainWindow(parent=None)
-    frame.Show()
+    MainWindow(parent=None)
     app.MainLoop()
-
 
 if __name__ == '__main__':
     main()
