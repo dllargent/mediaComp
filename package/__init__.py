@@ -16,7 +16,8 @@ __all__ = [
     "blockingPlayAtRateInRange", "getSamplingRate", "getSampleValueAt", "setSampleValueAt", "getSampleObjectAt", "setSampleValue", 
     "getSampleValue", "getSound", "getLength", "getNumSamples", "getDuration", "writeSoundTo", "randomSamples", "getIndex", 
     "playNote", "turn", "turnRight", "turnToFace", "turnLeft", "forward", "backward", "moveTo", "makeTurtle", "penUp", 
-    "penDown", "drop", "getXPos", "getYPos", "getHeading", "makeWorld", "getTurtleList"
+    "penDown", "drop", "getXPos", "getYPos", "getHeading", "makeWorld", "getTurtleList", "black", "white", "blue", "red", 
+    "green", "gray", "darkGray", "lightGray", "yellow", "orange", "pink", "magenta", "cyan"
 ]
 
 config = ConfigManager
