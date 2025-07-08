@@ -884,4 +884,4 @@ class Picture:
         """Explore a picture using a stand-alone Python script
         """
         filename = self.__saveInTempFile()
-        self.__runScript('./scripts/pictureTool.py', filename, self.title)
+        self.__runScript('./package/scripts/pictureTool.py', filename, self.title)

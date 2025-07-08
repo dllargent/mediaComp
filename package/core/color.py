@@ -1,5 +1,19 @@
 from ..models.PixelColor import Pixel, Color
 
+black = Color(0, 0, 0)
+white = Color(255, 255, 255)
+blue = Color(0, 0, 255)
+red = Color(255, 0, 0)
+green = Color(0, 255, 0)
+gray = Color(128, 128, 128)
+darkGray = Color(64, 64, 64)
+lightGray = Color(192, 192, 192)
+yellow = Color(255, 255, 0)
+orange = Color(255, 200, 0)
+pink = Color(255, 175, 175)
+magenta = Color(255, 0, 255)
+cyan = Color(0, 255, 255)
+
 def setColorWrapAround(setting):
     Pixel.setWrapLevels(bool(setting))
 
