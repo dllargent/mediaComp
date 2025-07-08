@@ -15,15 +15,15 @@ def chooseColor():
     Returns:
         RGB tuple or None.
     """
-    app = wx.App()
-
+    app = wx.App(False)
+    frame = wx.Frame(None)
     # setup defaults
     data = wx.ColourData()
     if wx.Platform == "__WXMAC__":
         data.SetChooseAlpha(False)
     data.SetChooseFull(True)
     data.SetColour(wx.WHITE) # show colors on initial color wheel on mac
-
+    
     # start and process the dialog
     color = None
     dlg = wx.ColourDialog(wx.GetApp().GetTopWindow(), data)

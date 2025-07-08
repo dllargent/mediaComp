@@ -113,7 +113,7 @@ def setLibPath(directory=None):
 
 def pickAFile():
     directory = config.getSessionPath()
-    scriptpath = os.path.join(config.getJES4PYPath(), 'scripts', 'filePicker.py')
+    scriptpath = os.path.join(config.getJES4PYPath(), 'package/scripts', 'filePicker.py')
     path = subprocess.check_output([sys.executable, scriptpath, 'file', directory]).decode().strip()
     if path:
         config.setSessionPath(os.path.dirname(path))
@@ -122,7 +122,7 @@ def pickAFile():
 
 def pickAFolder():
     directory = config.getSessionPath()
-    scriptpath = os.path.join(config.getJES4PYPath(), 'scripts', 'filePicker.py')
+    scriptpath = os.path.join(config.getJES4PYPath(), 'package/scripts', 'filePicker.py')
     path = subprocess.check_output([sys.executable, scriptpath, 'folder', directory]).decode().strip()
     if path:
         config.setSessionPath(path)

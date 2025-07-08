@@ -1,0 +1,6 @@
+*.jpg
+test.py
+/package/__pycache__/
+/package/core/__pycache__/
+/package/models/__pycache__/
+/package/scripts/__pycache__/

@@ -818,8 +818,8 @@ class Picture:
         proc = subprocess.Popen([sys.executable, scriptpath] + list(argv), stdin=PIPE, bufsize=0)
 
         # Register atexit handler if this is the first subprocess
-        if len(self.subprocessList) == 0:
-            atexit.register(self.__stopAllSubprocesses)
+        # if len(self.subprocessList) == 0:
+        #     atexit.register(self.__stopAllSubprocesses)
 
 
         # Record the process and return
@@ -859,7 +859,7 @@ class Picture:
 
         if self.process is None or self.process.poll() is not None:
             # a show process for this pic is not running, start a new one
-            self.process = self.__runScript('./scripts/show.py')
+            self.process = self.__runScript('./package/scripts/show.py')
         self.__sendPickledPicture()
 
         #self.__runScript('./scripts/displayImage.py', [filename])
@@ -884,4 +884,4 @@ class Picture:
         """Explore a picture using a stand-alone Python script
         """
         filename = self.__saveInTempFile()
-        self.__runScript('./scripts/pictureTool.py', filename, self.title)
+        self.__runScript('./package/scripts/pictureTool.py', filename, self.title)
