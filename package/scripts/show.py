@@ -108,7 +108,7 @@ class Listener(Thread):
                     traceback.print_exc(file=sys.stderr)
                     break
         finally:
-            print("Listener thread exiting", file=sys.stderr)
+            pass
 
     def stop(self):
         self._running = False
