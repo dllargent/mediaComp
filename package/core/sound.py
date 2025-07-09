@@ -312,17 +312,15 @@ def soundGUI(soundPlot, sound):
     window.title("Sound Explorer")
     window.geometry("900x700")
     window.configure(bg = "#9A9999")
-    pygame.mixer.init()
-    pygame.mixer.music.load(sound.getFileName())
+    soundObj = pygame.mixer.Sound(buffer=sound.getBuffer())
 
     def on_closing():
-        pygame.mixer.music.stop()
-        pygame.mixer.quit()
+        soundObj.stop()
         window.quit()
         window.destroy()
 
     window.protocol("WM_DELETE_WINDOW", on_closing)
-    button = tk.Button(window, width=12 ,text="Play Sound", bg="gray",command=lambda: pygame.mixer.music.play())
+    button = tk.Button(window, width=12 ,text="Play Sound", bg="gray",command=lambda: soundObj.play())
     button.pack()
     frame = tk.Frame(window, bg = "#9A9999")
     canvas = FigureCanvasTkAgg(figure=soundPlot, master=frame)
