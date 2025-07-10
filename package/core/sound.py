@@ -6,6 +6,7 @@ from ..models.Sample import Sample
 from ..models.Samples import Samples
 from .utils import getShortPath
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 
 def samplesToSound(samples):
@@ -27,7 +28,7 @@ def makeSound(filename):
         raise ValueError
     return Sound(filename)
 
-def makeEmptySound(numSamples, samplingRate=Sound.SAMPLE_RATE):
+def makeEmptySound(numSamples, samplingRate=Sound.SAMPLE_RATE, filename=None):
     numSamples = int(numSamples)
     if numSamples <= 0 or samplingRate <= 0:
         print("makeEmptySound(numSamples[, samplingRate]): numSamples and samplingRate must each be greater than 0")
@@ -35,7 +36,7 @@ def makeEmptySound(numSamples, samplingRate=Sound.SAMPLE_RATE):
     if (numSamples / samplingRate) > 600:
         print("makeEmptySound(numSamples[, samplingRate]): Created sound must be less than 600 seconds")
         raise ValueError
-    return Sound(numSamples, samplingRate)
+    return Sound(numSamples, samplingRate, filename)
 
 def makeEmptySoundBySeconds(seconds, samplingRate=Sound.SAMPLE_RATE):
     if seconds <= 0 or samplingRate <= 0:
@@ -77,7 +78,7 @@ def threadedPlay(sound):
     if not isinstance(sound, Sound):
         print("threadedPlay(sound): Input is not a sound")
         raise ValueError
-    threading.Thread(target = lambda: sound.blockingPlayMix(), daemon = True).start()
+    threading.Thread(target = lambda: sound.blockingPlay(), daemon = True).start()
 
 
 def stopPlaying(sound):
@@ -257,24 +258,73 @@ def playNote(note, duration, intensity=64):
         pygame.midi.quit()
 
 def soundTool(sound):
-    if isinstance(sound, Sound):
-        samplesList = list(map(getSampleValue,getSamples(sound)))
-        try:
-            fileName = getShortPath(sound.getFileName())
-            if fileName == "":
-                fileName = "No file name"
-        except:
+    # if isinstance(sound, Sound):
+    #     samplesList = list(map(getSampleValue,getSamples(sound)))
+    #     try:
+    #         fileName = getShortPath(sound.getFileName())
+    #         if fileName == "":
+    #             fileName = "No file name"
+    #     except:
+    #         fileName = "No file name"
+    #     plt.figure(num=fileName)
+    #     samplingRate = int(getSamplingRate(sound))
+    #     plotTitle = fileName + "  (" + str(samplingRate) + " samples/second)"
+    #     plt.title(plotTitle)
+    #     plt.subplots_adjust(left=0.15, bottom=.15)
+    #     plt.plot(range(1,1+len(samplesList)),samplesList)
+    #     plt.axline((0,0),slope=0, color='k')
+    #     plt.xlabel("Sample index (time)")
+    #     plt.ylabel("Sample value (volume)")
+    #     plt.show()
+    # else:
+    #     print("openSound(sound): Input is not a sound.")
+    #     raise ValueError
+    
+    soundGUI(createSoundPlot(sound), sound)
+    
+def createSoundPlot(sound):
+    try:
+        samplesList = list(map(getSampleValue, getSamples(sound)))
+        fileName = getShortPath(sound.getFileName())
+        if fileName == "":
             fileName = "No file name"
-        plt.figure(num=fileName)
-        samplingRate = int(getSamplingRate(sound))
-        plotTitle = fileName + "  (" + str(samplingRate) + " samples/second)"
-        plt.title(plotTitle)
-        plt.subplots_adjust(left=0.15, bottom=.15)
-        plt.plot(range(1,1+len(samplesList)),samplesList)
-        plt.axline((0,0),slope=0, color='k')
-        plt.xlabel("Sample index (time)")
-        plt.ylabel("Sample value (volume)")
-        plt.show()
-    else:
-        print("openSound(sound): Input is not a sound.")
-        raise ValueError
+    except:
+        fileName = "No file name"
+    figure, ax = plt.subplots( figsize= (8,6))
+    plotTitle = fileName + "  (" + str(int(getSamplingRate(sound))) + " samples/second)"
+    figure.canvas.manager.set_window_title(plotTitle)
+    waveform = ax
+    waveform.set_title(plotTitle)
+    sampleIndices = range(0, len(samplesList))
+    waveform.plot(sampleIndices, samplesList, color = "mediumseagreen", linewidth = 0.75)
+    waveform.grid(True, linestyle = "--", alpha = 0.7)
+
+    waveform.axline((0, 0), slope=0, color='k')
+    waveform.set_xlabel("Sample index (time)")
+    waveform.set_xlim(0, len(sampleIndices))
+    waveform.set_ylabel("Sample value (volume)")
+    waveform.set_ylim(-32768, 32767)
+
+    return figure
+
+def soundGUI(soundPlot, sound):
+    window = tk.Tk()
+    window.title("Sound Explorer")
+    window.geometry("900x700")
+    window.configure(bg = "#9A9999")
+    soundObj = pygame.mixer.Sound(buffer=sound.getBuffer())
+
+    def on_closing():
+        soundObj.stop()
+        window.quit()
+        window.destroy()
+
+    window.protocol("WM_DELETE_WINDOW", on_closing)
+    button = tk.Button(window, width=12 ,text="Play Sound", bg="gray",command=lambda: soundObj.play())
+    button.pack()
+    frame = tk.Frame(window, bg = "#9A9999")
+    canvas = FigureCanvasTkAgg(figure=soundPlot, master=frame)
+    frame.pack(padx = 10, pady = 10, fill = "both") 
+    canvas.get_tk_widget().pack()
+    canvas.draw()
+    window.mainloop()

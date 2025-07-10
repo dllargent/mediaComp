@@ -1,5 +1,6 @@
 from .SoundSample import SoundSample
 import wave
+import os
 import simpleaudio as sa
 import pygame
 import threading
@@ -11,7 +12,7 @@ class Sound:
     NUM_BITS_PER_SAMPLE = 16
     _SoundIndexOffset = 0
 
-    def __init__(self, sound, sampleRate=22050):
+    def __init__(self, sound, sampleRate=22050, filename=None):
         """Construct new sound object
         
         If first passed parameter is the name of a WAV file, then read
@@ -31,7 +32,7 @@ class Sound:
         sound with a buffer and the AudioFileFormat.  If a file is
         desired, then the method writeToFile(filename) must be called
         on this newly created sound.
-    
+
         Parameters
         ----------
         sound : str
@@ -44,17 +45,20 @@ class Sound:
             the frame rate for the sound
         """
         if isinstance(sound, str):
-            self.filename = sound
+            self.filename = filename if filename is not None else sound
             self.lock = threading.Lock()
             self.is_playing = False
-            waveRead = wave.open(self.filename, 'rb')
-            self.numFrames = waveRead.getnframes()
-            self.numChannels = waveRead.getnchannels()
-            self.sampleWidth = waveRead.getsampwidth()
-            self.sampleRate = waveRead.getframerate()
-            self.buffer = bytearray(waveRead.readframes(self.numFrames))
+            
+            # Use context manager to ensure file is properly closed
+            with wave.open(self.filename, 'rb') as waveRead:
+                self.numFrames = waveRead.getnframes()
+                self.numChannels = waveRead.getnchannels()
+                self.sampleWidth = waveRead.getsampwidth()
+                self.sampleRate = waveRead.getframerate()
+                self.buffer = bytearray(waveRead.readframes(self.numFrames))
+                
         elif isinstance(sound, int):
-            self.filename = ''
+            self.filename = filename if filename is not None else ''
             self.numFrames = sound
             self.lock = threading.Lock()
             self.is_playing = False
@@ -63,8 +67,9 @@ class Sound:
             self.sampleRate = sampleRate
             numBytes = self.numChannels * self.numFrames * self.sampleWidth
             self.buffer = bytearray([0] * numBytes)
+            
         elif isinstance(sound, Sound):
-            self.filename = sound.filename
+            self.filename = filename if filename is not None else sound.filename
             self.numFrames = sound.numFrames
             self.lock = threading.Lock()
             self.is_playing = False
@@ -72,9 +77,37 @@ class Sound:
             self.sampleWidth = sound.sampleWidth
             self.sampleRate = sound.sampleRate
             self.buffer = sound.buffer.copy()
+        
+        # Initialize pygame mixer (consider moving this to a global init function)
         size = int(8 * self.sampleWidth)
-        pygame.mixer.init(frequency = self.sampleRate, size = size, channels = self.numChannels)
-        self.soundMix = pygame.mixer.Sound(self.filename)
+        try:
+            pygame.mixer.init(frequency=self.sampleRate, size=size, channels=self.numChannels)
+        except pygame.error as e:
+            print(f"Warning: Could not initialize pygame mixer: {e}")
+        
+        # Create pygame Sound object with error handling
+        self.soundMix = None
+        try:
+            if self.filename and os.path.isfile(self.filename):
+                # First try loading from file
+                self.soundMix = pygame.mixer.Sound(self.filename)
+            else:
+                # If no file or file doesn't exist, create from buffer
+                self.soundMix = pygame.mixer.Sound(buffer=self.buffer)
+        except:
+            # Fallback: try creating from buffer
+            try:
+                self.soundMix = pygame.mixer.Sound(buffer=self.buffer)
+            except:
+                # Last resort: create a simple sound or set to None
+                try:
+                    # Create a minimal sound buffer for testing
+                    simple_buffer = bytearray([0] * (self.sampleRate * self.sampleWidth * self.numChannels))
+                    self.soundMix = pygame.mixer.Sound(buffer=simple_buffer)
+                except:
+                    print("Could not create any pygame Sound object")
+                    self.soundMix = None
+        
         self.playbacks = []
 
     def __str__(self):
@@ -122,11 +155,6 @@ class Sound:
             the sampling rate
         """
         return self.sampleRate
-
-    def getSoundExplorer(self):
-        return "The sound explore tool is not implemented yet for jes4py"
-        #return self.soundExplorer
-        # not yet defined
 
     def asArray(self):
         """Returns an array representation of the sound
@@ -207,13 +235,6 @@ class Sound:
         elif isinstance(newBuffer, bytearray):
             self.buffer = newBuffer.copy() #maybe not a copy?
 
-    # def setAudioFileFormat(self, audioFileFormat):
-    #     self.audioFileFormat = audioFileFormat
-    
-    def setSoundExplorer(self, soundExplorer):
-        #self.soundExplorer = soundExplorer
-        print("The sound explorer tool is not yet properly implemented for jes4py")
-
     # ------------------------ methods ---------------------------------------
 
     def makeAIS(self):
@@ -247,40 +268,19 @@ class Sound:
         pygame.time.wait(int(self.soundMix.get_length() * 1000))
         self.is_playing = False
 
-    def explore(self):
-        """Open a sound explorer on a copy of this sound
-        """
-        # Make a new sound explorer
-        # Open it with a copy of this sound
-        print("The sound explore tool is not yet implemented in jes4py")
-
     def playNote(self, key, duration, intensity):
         print("This method is not implemented in jes4py.")
 
     def convert(self, mp3File, wavFile):
         print("this method isn't implemented.")
-        # try:
-        #     fi = open(mp3File, "r")
-        #     contents = fi.read()
-        #     fi.close()
-        #     writeFi = open(wavFile, "w")
-        #     writeFi.write(contents)
-        #     writeFi.close()
-        #     print("this method isn't implemented yet.")
-        # except Exception:
-        #     print("Couldn't covert the file {}".format(mp3File))
-
-    # def blockingPlay(self):
-    #     """Play a sound - blocking
-    #     """
-    #     self.play()
-    #     self.playbacks[-1].wait_done()
     
     def blockingPlay(self):
         try:
             wave = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
             playback = wave.play()
             playback.wait_done()
+            del wave
+            del playback
         except Exception as e:
             print("Playback error:", e)
 
@@ -377,7 +377,7 @@ class Sound:
         try:
             value = self.getSampleValue(index)
         except:
-            reportIndexException(index)
+            raise(IndexError("The index {} is not valid for this sound".format(index)))
         return value
     
     def getSampleValue(self, frameNum):
@@ -449,7 +449,7 @@ class Sound:
         int
             the sound length in bytes
         """
-        return len(buffer)
+        return len(self.buffer)
 
     def getLength(self):
         """Return the length of the sound as the number of samples
@@ -491,7 +491,7 @@ class Sound:
         try:
             self.setSampleValue(index, int(value))
         except:
-            reportIndexException(index)
+            raise(IndexError("The index {} is not valid for this sound".format(index)))
 
     def setSampleValue(self, frameNum, value):
         """Sets the value of the sample found at the specified frame
