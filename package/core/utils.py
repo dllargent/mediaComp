@@ -1,7 +1,7 @@
 import os
 import sys
 import subprocess
-import _tkinter as tk
+import tkinter as tk
 from tkinter import simpledialog
 from tkinter import messagebox
 
