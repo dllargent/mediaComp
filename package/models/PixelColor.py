@@ -33,7 +33,6 @@ class Pixel:
         self.image = image
         self.x = x
         self.y = y
-        #self.color = color
 
     def __str__(self):
         """Return string with pixel contents
@@ -139,7 +138,6 @@ class Pixel:
             alpha level for pixel
         """
         value = 0
-        # do nothing, as we have not implemented alpha values
 
     def setRed(self, value):
         """Set red level in the pixel
@@ -511,13 +509,10 @@ class Color:
             lighter version of this color
         """
         if self.color == (0,0,0):
-            # Special case -- black gets lighted to very dark gray
             lighterColor = Color(3,3,3)
         else:
-            # Scale color values by 10/7
             lighterColor = self.scaleColor(10.0/7.0)
             if max(lighterColor.color) <= 2:
-                # if all color values are 2 or less we need to adjust them
                 c = list(lighterColor.color)
                 for i in range(3):
                     if c[i] > 0 and c[i] < 2:
@@ -529,7 +524,6 @@ class Color:
 
     @classmethod
     def pickAColor(cls):
-        # Start subprocess using current Python interpreter to run a script
         scriptpath = os.path.join(config.get("CONFIG_JES4PY_PATH"),
             './package/scripts/colorPicker.py')
         color = subprocess.check_output([sys.executable, scriptpath]).decode()

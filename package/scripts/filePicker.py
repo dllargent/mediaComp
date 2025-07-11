@@ -25,14 +25,12 @@ def fileDialog(defaultFolder):
     app = wx.App()
     frame = wx.Frame(None, -1, 'PickAFile')
 
-    # Create open file dialog
     path = None
     openFileDialog = wx.FileDialog(frame, 'Pick A File', defaultFolder,
         "", "", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
     if openFileDialog.ShowModal() == wx.ID_OK:
         path = openFileDialog.GetPath()
     
-    # Clean up
     openFileDialog.Destroy()
     return path
 
@@ -51,14 +49,12 @@ def folderDialog(defaultFolder):
     app = wx.App()
     frame = wx.Frame(None, -1, 'pickADirectory')
 
-    # Create open file dialog
     path = None
     openDirDialog = wx.DirDialog(frame, 'Pick A Folder', defaultFolder,
         wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
     if openDirDialog.ShowModal() == wx.ID_OK:
         path = openDirDialog.GetPath()
 
-    # Clean up
     openDirDialog.Destroy()
     return path
 

@@ -49,7 +49,6 @@ class Sound:
             self.lock = threading.Lock()
             self.is_playing = False
             
-            # Use context manager to ensure file is properly closed
             with wave.open(self.filename, 'rb') as waveRead:
                 self.numFrames = waveRead.getnframes()
                 self.numChannels = waveRead.getnchannels()
@@ -78,30 +77,23 @@ class Sound:
             self.sampleRate = sound.sampleRate
             self.buffer = sound.buffer.copy()
         
-        # Initialize pygame mixer (consider moving this to a global init function)
         size = int(8 * self.sampleWidth)
         try:
             pygame.mixer.init(frequency=self.sampleRate, size=size, channels=self.numChannels)
         except pygame.error as e:
             print(f"Warning: Could not initialize pygame mixer: {e}")
         
-        # Create pygame Sound object with error handling
         self.soundMix = None
         try:
             if self.filename and os.path.isfile(self.filename):
-                # First try loading from file
                 self.soundMix = pygame.mixer.Sound(self.filename)
             else:
-                # If no file or file doesn't exist, create from buffer
                 self.soundMix = pygame.mixer.Sound(buffer=self.buffer)
         except:
-            # Fallback: try creating from buffer
             try:
                 self.soundMix = pygame.mixer.Sound(buffer=self.buffer)
             except:
-                # Last resort: create a simple sound or set to None
                 try:
-                    # Create a minimal sound buffer for testing
                     simple_buffer = bytearray([0] * (self.sampleRate * self.sampleWidth * self.numChannels))
                     self.soundMix = pygame.mixer.Sound(buffer=simple_buffer)
                 except:
@@ -142,9 +134,6 @@ class Sound:
             The sounds buffer(i.e. an array representaion of the sound)
         """
         return self.buffer
-
-#    def getAudioFileFormat(self):
-#        return self.audioFileFormat # not yet defined
 
     def getSamplingRate(self):
         """Return this sound's sampling rate
@@ -233,7 +222,7 @@ class Sound:
         if isinstance(newBuffer, int):
             self.buffer = bytearray(newBuffer)
         elif isinstance(newBuffer, bytearray):
-            self.buffer = newBuffer.copy() #maybe not a copy?
+            self.buffer = newBuffer.copy() 
 
     # ------------------------ methods ---------------------------------------
 
@@ -604,10 +593,6 @@ class Sound:
         outFileName : str
             the name of the file to write the sound to
         """
-        # Append the .wav extension if the filename doesn't have it
-        # (Uncomment the next two lines to implement this functionality)
-        # if not outFileName.endswith(".wav"):
-        #     outFileName = outFileName+".wav"
 
         file = wave.open(outFileName, "wb")
         file.setnframes(self.numFrames)

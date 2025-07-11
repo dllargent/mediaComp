@@ -17,14 +17,11 @@ def chooseColor():
     """
     app = wx.App(False)
     frame = wx.Frame(None)
-    # setup defaults
     data = wx.ColourData()
     if wx.Platform == "__WXMAC__":
         data.SetChooseAlpha(False)
     data.SetChooseFull(True)
-    data.SetColour(wx.WHITE) # show colors on initial color wheel on mac
-    
-    # start and process the dialog
+    data.SetColour(wx.WHITE) 
     color = None
     dlg = wx.ColourDialog(wx.GetApp().GetTopWindow(), data)
     if dlg.ShowModal() == wx.ID_OK:
@@ -32,8 +29,6 @@ def chooseColor():
         green = dlg.GetColourData().GetColour().Green()
         blue  = dlg.GetColourData().GetColour().Blue()
         color = (red, green, blue)
-
-    # clean up
     dlg.Destroy()
     return color
 

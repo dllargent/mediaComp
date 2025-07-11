@@ -23,14 +23,11 @@ class Picture:
         """
         self.filename = self.title = 'None'
         if len(args) == 0:
-            # no parameters, make 100x200 picture with white background
             self.image = PIL.Image.new("RGB", (200, 100), (255, 255, 255))
         elif len(args) == 1:
             if isinstance(args[0], str):
                 self.filename = self.title = args[0]
-                # Assume 'we've been passed a filename
                 if not os.path.isfile(self.filename):
-                    # File not found, try prepending media path
                     filepath = FileChooser.getMediaPath(self.filename)
                     if os.path.isfile(filepath):
                         self.filename = self.title = filepath
@@ -41,19 +38,16 @@ class Picture:
                     draw = PIL.ImageDraw.Draw(self.image)
                     draw.text((0, 100), "Couldn't load " + self.filename)
             elif isinstance(args[0], Picture):
-                # We've been passed a Picture object
                 self.image = args[0].image.copy()
                 self.filename = args[0].filename
                 self.title = args[0].title
             elif isinstance(args[0], PIL.Image.Image):
-                # We've been passed a PIL image object
                 self.image = args[0]
                 try:
                     self.filename = self.title = args[0].filename
                 except AttributeError:
                     pass
         elif len(args) == 2 or len(args) == 3:
-            # We've been passed width and height, and possibly a color
             size = (int(args[0]), int(args[1]))
             c = Color(255,255,255) if len(args) == 2 else args[2]
             self.image = PIL.Image.new("RGB", size, c.color)
@@ -292,9 +286,6 @@ class Picture:
             the text that will be drawn on the picture
         """
         draw = PIL.ImageDraw.Draw(self.image)
-        # font = ImageFont.truetype(<font-file>, <font-size>)
-        # font = ImageFont.truetype("sans-serif.ttf", 16)
-        # draw.text((x, y),"Sample Text",(r,g,b))
         draw.text((x, y), string, acolor.getRGB())
 
     def addTextWithStyle(self, acolor, x, y, string, style):
@@ -313,11 +304,6 @@ class Picture:
         style : ???
             the font style to be used
         """
-    #    draw = PIL.ImageDraw.Draw(self.image)
-    #    # font = ImageFont.truetype(<font-file>, <font-size>)
-    #    # font = ImageFont.truetype("sans-serif.ttf", 16)
-    #    # draw.text((x, y),"Sample Text",(r,g,b))
-    #    draw.text((x, y), string, acolor.getRGB())
         print("This function is not yet implemented.")
 
     def addRect(self, acolor, x, y, w, h):
@@ -471,19 +457,6 @@ class Picture:
         """
         srcWidth = self.getWidth()
         srcHeight = self.getHeight()
-        # # The next block of statments deal with cases where the self
-        # # picture would extend past the rigth or bottom border of the
-        # # destination picture. This is good, but an enhancement over
-        # # what JES does.  To make it useful we should also allow for
-        # # negative upperLeftX and upperLeftY values so the src picture
-        # # could extend past the left or top border.  Until this is done
-        # # we'll just leave this code disabled
-        # dstWidth = dest.getWidth()
-        # dstHeight = dest.getHeight()
-        # if upperLeftX + srcWidth >= dstWidth:
-        #     srcWidth = dstWidth - upperLeftX
-        # if upperLeftY + srcHeight >= dstHeight:
-        #     srcHeight = dstHeight - upperLeftY
         for x in range(0, srcWidth):
             for y in range(0, srcHeight):
                 srcPix = self.getPixel(x, y)
@@ -560,7 +533,6 @@ class Picture:
         Picture
             a scaled version of the picture with height of (height)
         """
-        # // set up the scale tranform
         yFactor = height / self.getHeight()
         result = self.scale(yFactor, yFactor)
         return result
@@ -581,7 +553,6 @@ class Picture:
         Picture
             a scaled version of the picture with width of (width)
         """
-        # // set up the scale tranform
         xFactor = width / self.getWidth()
         result = self.scale(xFactor, xFactor)
         return result
@@ -601,10 +572,7 @@ class Picture:
         """
         result = True
 
-        # try to load the picture into the buffered image from the file name
         result = self.load(fileName)
-
-        # show the picture in a picture frame
         self.show()
 
         return result
@@ -641,7 +609,7 @@ class Picture:
         fileName : str
             the name of the file to load the picture from
         """
-        self.image = PIL.Image.open(fileName) #.convert('RGB')
+        self.image = PIL.Image.open(fileName) 
         self.filename = self.title = fileName
 
 
@@ -673,18 +641,15 @@ class Picture:
         fileName : str
             the name of the file to write the picture to
         """
-        # get name and extension
         name, ext = os.path.splitext(fileName)
         imageType = None
  
-        # if no extension, use JES default
         if ext == '':
             imageType = self.extension.replace('.', '')
             if imageType.lower() == 'jpg':
                 imageType = 'jpeg'
             print('imageType = {}'.format(imageType))
  
-        # write file
         self.image.save(fileName, format=imageType)
 
     def setMediaPath(self, directory):
@@ -741,7 +706,6 @@ class Picture:
         y : int
             the y-coordinate of the top left corner of the text
         """
-        # get a graphics context to use to draw on the buffered image
         col = Color(0,0,0)
         self.addText(col, xPos, yPos, message)
 
@@ -755,7 +719,6 @@ class Picture:
         y : int
             the y-coordinate of the top left corner of the text
         """
-        # get a graphics context to use to draw on the buffered image
         self.addMessage(text, xPos, yPos)
 
 #----------------------------------------------------------------------------
@@ -813,16 +776,8 @@ class Picture:
         -------
         Popen instance
         """
-        # Start subprocess using current Python interpreter to run a script
         scriptpath = os.path.join(config.get("CONFIG_JES4PY_PATH"), script)
         proc = subprocess.Popen([sys.executable, scriptpath] + list(argv), stdin=PIPE, bufsize=0)
-
-        # Register atexit handler if this is the first subprocess
-        # if len(self.subprocessList) == 0:
-        #     atexit.register(self.__stopAllSubprocesses)
-
-
-        # Record the process and return
         self.subprocessList.append(proc)
         return proc
 
@@ -836,7 +791,7 @@ class Picture:
                 self.process.stdin.close()
                 proc.terminate()
                 proc.wait(timeout=0.2)
-            except: # BrokenPipeError, OSError:
+            except: 
                 pass
 
     def __sendPickledPicture(self):
@@ -862,21 +817,16 @@ class Picture:
             self.process = self.__runScript('./package/scripts/show.py')
         self.__sendPickledPicture()
 
-        #self.__runScript('./scripts/displayImage.py', [filename])
-
     def repaint(self):
         """Reshow a picture using stand-alone Python script
         """
         if (self.process is not None) and self.process.poll() is None:
-            # subprocess seems to be running, ask it to update image
             try:
                 self.__sendPickledPicture()
-            except: # BrokenPipeError:
-                # something went wrong, reset and call show
+            except: 
                 self.process = None
                 self.show()
         else:
-            # subprocess is not running, start a new one
             self.process = None
             self.show()
 

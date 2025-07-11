@@ -1,7 +1,8 @@
 from .Picture import Picture
+from ..core import makePicture
 
 class Movie(object):
-    def __init__(self):  # frames are filenames
+    def __init__(self):  
         self.frames = []
         self.dir = None
 
