@@ -67,9 +67,9 @@ def pickAFolder():
 '''
 from ..models.Config import ConfigManager
 
-config = ConfigManager()
+config = ConfigManager() 
 
-def setMediaPath(path=None):
+def setMediaFolder(path=None):
     if path is None:
         pickMediaPath()
     elif os.path.exists(path):
@@ -77,12 +77,6 @@ def setMediaPath(path=None):
     else:
         config.setMediaPath("C:\\")
     return config.getMediaPath()
-
-def getMediaPath(filename=""):
-    return config.getMediaPath(filename)
-
-def setMediaFolder(path=None):
-    return setMediaPath(path)
 
 def setTestMediaFolder():
     config.setMediaPath(os.getcwd() + os.sep)
@@ -102,7 +96,7 @@ def getShortPath(filename):
     else:
         return os.path.join(dirs[-2], dirs[-1])
 
-def setLibPath(directory=None):
+def setLibFolder(directory=None):
     if directory is None:
         directory = pickAFolder()
     if os.path.isdir(directory):

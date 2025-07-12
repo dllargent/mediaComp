@@ -145,10 +145,11 @@ def setSampleValueAt(sound, index, value):
         print("setSampleValueAt(sound,index,value): First input is not a sound")
         raise ValueError
     if index < Sound._SoundIndexOffset:
-        print("You asked for the sample at index: " + str(index) + ".  This number is less than " + str(Sound._SoundIndexOffset) + ".  Please try" + " again using an index in the range [" + str(Sound._SoundIndexOffset) + "," + str(getLength(sound) - 1 + Sound._SoundIndexOffset) + "].")
+        print("You asked for the sample at index: " + str(index) + ".  This number is less than " + str(Sound._SoundIndexOffset) + ".  Please try" + " again using an index in the range [" + str(Sound._SoundIndexOffset) + "," + str(getNumSamples
+        (sound) - 1 + Sound._SoundIndexOffset) + "].")
         raise ValueError
-    if index > getLength(sound) - 1 + Sound._SoundIndexOffset:
-        print("You are trying to access the sample at index: " + str(index) + ", but the last valid index is at " + str(getLength(sound) - 1 + Sound._SoundIndexOffset))
+    if index > getNumSamples(sound) - 1 + Sound._SoundIndexOffset:
+        print("You are trying to access the sample at index: " + str(index) + ", but the last valid index is at " + str(getNumSamples(sound) - 1 + Sound._SoundIndexOffset))
         raise ValueError
     sound.setSampleValue(index - Sound._SoundIndexOffset, int(value))
 
@@ -158,25 +159,12 @@ def getSampleValueAt(sound, index):
         print("getSampleValueAt(sound,index): First input is not a sound")
         raise ValueError
     if index < Sound._SoundIndexOffset:
-        print("You asked for the sample at index: " + str(index) + ".  This number is less than " + str(Sound._SoundIndexOffset) + ".  Please try" + " again using an index in the range [" + str(Sound._SoundIndexOffset) + "," + str(getLength(sound) - 1 + Sound._SoundIndexOffset) + "].")
+        print("You asked for the sample at index: " + str(index) + ".  This number is less than " + str(Sound._SoundIndexOffset) + ".  Please try" + " again using an index in the range [" + str(Sound._SoundIndexOffset) + "," + str(getNumSamples(sound) - 1 + Sound._SoundIndexOffset) + "].")
         raise ValueError
-    if index > getLength(sound) - 1 + Sound._SoundIndexOffset:
-        print("You are trying to access the sample at index: " + str(index) + ", but the last valid index is at " + str(getLength(sound) - 1 + Sound._SoundIndexOffset))
+    if index > getNumSamples(sound) - 1 + Sound._SoundIndexOffset:
+        print("You are trying to access the sample at index: " + str(index) + ", but the last valid index is at " + str(getNumSamples(sound) - 1 + Sound._SoundIndexOffset))
         raise ValueError
     return sound.getSampleValue(index - Sound._SoundIndexOffset)
-
-
-def getSampleObjectAt(sound, index):
-    if not isinstance(sound, Sound):
-        print("getSampleObjectAt(sound,index): First input is not a sound")
-        raise ValueError
-    if index < Sound._SoundIndexOffset:
-        print("You asked for the sample at index: " + str(index) + ".  This number is less than " + str(Sound._SoundIndexOffset) + ".  Please try" + " again using an index in the range [" + str(Sound._SoundIndexOffset) + "," + str(getLength(sound) - 1 + Sound._SoundIndexOffset) + "].")
-        raise ValueError
-    if index > getLength(sound) - 1 + Sound._SoundIndexOffset:
-        print("You are trying to access the sample at index: " + str(index) + ", but the last valid index is at " + str(getLength(sound) - 1 + Sound._SoundIndexOffset))
-        raise ValueError
-    return Sample(sound, index - Sound._SoundIndexOffset)
 
 
 def setSampleValue(sample, value):
@@ -202,16 +190,11 @@ def getSound(sample):
         raise ValueError
     return sample.getSound()
 
-def getLength(sound):
+def getNumSamples(sound):
     if not isinstance(sound, Sound):
         print("getLength(sound): Input is not a sound")
         raise ValueError
     return sound.getLength()
-
-
-def getNumSamples(sound):
-    return getLength(sound)
-
 
 def getDuration(sound):
     if not isinstance(sound, Sound):
