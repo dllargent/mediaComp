@@ -525,7 +525,7 @@ class Color:
     @classmethod
     def pickAColor(cls):
         scriptpath = os.path.join(config.get("CONFIG_JES4PY_PATH"),
-            './package/scripts/colorPicker.py')
+            './src/mediaComp/scripts/colorPicker.py')
         color = subprocess.check_output([sys.executable, scriptpath]).decode()
         if color == '':
             color = None

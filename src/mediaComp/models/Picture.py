@@ -814,7 +814,7 @@ class Picture:
 
         if self.process is None or self.process.poll() is not None:
             # a show process for this pic is not running, start a new one
-            self.process = self.__runScript('./package/scripts/show.py')
+            self.process = self.__runScript('./src/mediaComp/scripts/show.py')
         self.__sendPickledPicture()
 
     def repaint(self):
@@ -834,4 +834,4 @@ class Picture:
         """Explore a picture using a stand-alone Python script
         """
         filename = self.__saveInTempFile()
-        self.__runScript('./package/scripts/pictureTool.py', filename, self.title)
+        self.__runScript('./src/mediaComp/scripts/pictureTool.py', filename, self.title)

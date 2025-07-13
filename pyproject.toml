@@ -29,5 +29,6 @@ Issues = "https://github.com/dllargent/mediaComp/issues"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
-  "*.docx"
+  "*.docx",
+  "**/__pycache__"
 ]
