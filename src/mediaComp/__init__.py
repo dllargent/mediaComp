@@ -1,5 +1,5 @@
 from .core import *
-from mediaPy.models.Config import ConfigManager
+from mediaComp.models.Config import ConfigManager
 
 __all__ = [
     "setColorWrapAround", "getColorWrapAround", "pickAColor", "distance", "makeDarker", "makeLighter", "makeColor",

@@ -17,18 +17,18 @@ for path in [parent_dir, package_dir]:
 
 package_imported = False
 try:
-    from mediaPy import *
+    from mediaComp import *
     package_imported = True
 except ImportError:
     try:
         sys.path.insert(0, package_dir)
-        from mediaPy.core import *
-        from mediaPy.models import *
+        from mediaComp.core import *
+        from mediaComp.models import *
         package_imported = True
     except ImportError:
         try:
-            from mediaPy.core import *
-            from mediaPy.models import *
+            from mediaComp.core import *
+            from mediaComp.models import *
             package_imported = True
         except ImportError as e:
             print(f"Warning: Could not import package modules: {e}", file=sys.stderr)
