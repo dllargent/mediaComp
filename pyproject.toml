@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mediaPy"
+version = "0.0.1"
+authors = [
+  { name="Jason Yoder", email="jason.yoder2@bsu.edu" },
+  { name="David Largent", email="dllargent@bsu.edu"}
+]
+maintainers = [
+  { name="Jason Yoder", email="jason.yoder2@bsu.edu" },
+  { name="David Largent", email="dllargent@bsu.edu"}
+]
+description = "A multimedia processing library for Python 3."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "GNU"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/dllargent/mediaPy"
+Issues = "https://github.com/dllargent/mediaPy/issues"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "*.docx"
+]
