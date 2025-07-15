@@ -1,8 +1,7 @@
-*.jpg
-/src/mediaComp/__pycache__/
-/src/mediaComp/core/__pycache__/
-/src/mediaComp/models/__pycache__/
-/src/mediaComp/scripts/__pycache__/
-vent-test/
+src/mediaComp/__pycache__/
+src/mediaComp/core/__pycache__/
+src/mediaComp/models/__pycache__/
+src/mediaComp/scripts/__pycache__/
+venv-test/
 test_env/
-/dist/
+dist/
