@@ -43,12 +43,12 @@ def readDict(filePath):
     return dict
 '''
 
-CONFIG_FILENAME = ".jes4pyconf"
+CONFIG_FILENAME = ".mediaCompConfig.json"
 DEFAULT_CONFIG = {
     "CONFIG_WRAPPIXELVALUES": False,
     "CONFIG_MEDIA_PATH": "",
     "CONFIG_SESSION_PATH": "",
-    "CONFIG_JES4PY_PATH": ""
+    "CONFIG_MEDIACOMP_PATH": ""
 }
 
 class ConfigManager:
@@ -100,8 +100,8 @@ class ConfigManager:
     def setSessionPath(self, path):
         self.set("CONFIG_SESSION_PATH", path)
 
-    def setJES4PYPath(self, path):
-        self.set("CONFIG_JES4PY_PATH", path)
+    def setMEDIACOMPPath(self, path):
+        self.set("CONFIG_MEDIACOMP_PATH", path)
 
-    def getJES4PYPath(self):
-        return self.get("CONFIG_JES4PY_PATH")
+    def getMEDIACOMPPath(self):
+        return self.get("CONFIG_MEDIACOMP_PATH")
