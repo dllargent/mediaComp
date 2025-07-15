@@ -1,13 +1,8 @@
 *.jpg
-test.py
-/package/__pycache__/
-/package/core/__pycache__/
-/package/models/__pycache__/
-/package/scripts/__pycache__/
-/Activity files/
-/Labs/
-Lab12.py
-interleave.py
-preamble.wav
-gettysburg.wav
-airplane.wav
+/src/mediaComp/__pycache__/
+/src/mediaComp/core/__pycache__/
+/src/mediaComp/models/__pycache__/
+/src/mediaComp/scripts/__pycache__/
+vent-test/
+test_env/
+/dist/
