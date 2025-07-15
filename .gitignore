@@ -1,7 +1,4 @@
-src/mediaComp/__pycache__/
-src/mediaComp/core/__pycache__/
-src/mediaComp/models/__pycache__/
-src/mediaComp/scripts/__pycache__/
+__pycache__/
 venv-test/
 test_env/
 dist/
