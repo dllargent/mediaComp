@@ -2,6 +2,7 @@ from .core import *
 from mediaComp.models.Config import ConfigManager
 import os
 
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 __all__ = [
     "setColorWrapAround", "getColorWrapAround", "pickAColor", "distance", "makeDarker", "makeLighter", "makeColor",
     "setMediaFolder", "setTestMediaFolder", "getMediaFolder", 
@@ -21,6 +22,5 @@ __all__ = [
     "green", "gray", "darkGray", "lightGray", "yellow", "orange", "pink", "magenta", "cyan"
 ]
 
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-config = ConfigManager
+config = ConfigManager()
 config.setMEDIACOMPPath()
