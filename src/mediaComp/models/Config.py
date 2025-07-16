@@ -100,8 +100,9 @@ class ConfigManager:
     def setSessionPath(self, path):
         self.set("CONFIG_SESSION_PATH", path)
 
-    def setMEDIACOMPPath(self, path):
-        self.set("CONFIG_MEDIACOMP_PATH", path)
+    def setMEDIACOMPPath(self):
+        import mediaComp
+        self.set("CONFIG_MEDIACOMP_PATH", os.path.dirname(mediaComp.__file__))
 
     def getMEDIACOMPPath(self):
         return self.get("CONFIG_MEDIACOMP_PATH")
