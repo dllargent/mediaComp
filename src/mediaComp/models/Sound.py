@@ -227,7 +227,7 @@ class Sound:
     # ------------------------ methods ---------------------------------------
 
     def makeAIS(self):
-        print('This function is not implemented in jes4py.')
+        print('This function is not implemented in MediaComp.')
 
     def isStereo(self):
         """Method to check if a sound is stereo (2 channel) or not
@@ -258,7 +258,7 @@ class Sound:
         self.is_playing = False
 
     def playNote(self, key, duration, intensity):
-        print("This method is not implemented in jes4py.")
+        print("This method is not implemented in mediaComp.")
 
     def convert(self, mp3File, wavFile):
         print("this method isn't implemented.")

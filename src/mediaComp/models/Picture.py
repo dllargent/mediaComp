@@ -758,7 +758,7 @@ class Picture:
         string
             path to temporary image file
         """
-        filename = os.path.join(tempfile.gettempdir(), f"jes4py_{uuid.uuid4().hex}.png")
+        filename = os.path.join(tempfile.gettempdir(), f"mediaComp_{uuid.uuid4().hex}.png")
         self.write(filename)
         return filename
 
@@ -768,7 +768,7 @@ class Picture:
         Parameters
         ----------
         script : str
-            the script to run; must be in the jes4py directory
+            the script to run; must be in the mediaComp directory
         *argv : list
             parameters to pass to script on command line
 
