@@ -1,8 +1,9 @@
-from .core import *
-from mediaComp.models.Config import ConfigManager
 import os
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+from .core import *
+from mediaComp.models.Config import ConfigManager
+
 __all__ = [
     "setColorWrapAround", "getColorWrapAround", "pickAColor", "distance", "makeDarker", "makeLighter", "makeColor",
     "setMediaFolder", "setTestMediaFolder", "getMediaFolder", 
