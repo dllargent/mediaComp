@@ -13,16 +13,26 @@ class ConfigManager:
     def __init__(self):
         self.file_path = os.path.join(os.path.expanduser("~"), CONFIG_FILENAME)
         self.config = DEFAULT_CONFIG.copy()
-        self._load()
+        
+        if not os.path.exists(self.file_path):
+            self._save() 
+        
+        self._load() 
+
+        if not self.get("CONFIG_MEDIACOMP_PATH"):
+            try:
+                import mediaComp
+                self.set("CONFIG_MEDIACOMP_PATH", os.path.dirname(mediaComp.__file__))
+            except Exception as e:
+                print(f"Warning: Could not auto-set MediaComp path: {e}")
 
     def _load(self):
-        if os.path.exists(self.file_path):
-            try:
-                with open(self.file_path, "r") as f:
-                    stored = json.load(f)
-                self.config.update(stored)
-            except Exception as e:
-                print(f"Warning: Failed to load config: {e}")
+        try:
+            with open(self.file_path, "r") as f:
+                stored = json.load(f)
+            self.config.update(stored)
+        except Exception as e:
+            print(f"Warning: Failed to load config: {e}")
 
     def _save(self):
         try:

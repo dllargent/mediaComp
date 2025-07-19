@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.1.0"
+version = "0.1.4"
 dependencies = [
   "wxPython > 4.2.0",
   "pillow >11.0.0",
@@ -37,5 +37,6 @@ Issues = "https://github.com/dllargent/mediaComp/issues"
 [tool.hatch.build.targets.sdist]
 exclude = [
   "*.docx",
-  "**/__pycache__"
+  "**/__pycache__",
+  "test.py"
 ]
