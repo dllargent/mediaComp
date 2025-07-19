@@ -1,7 +1,7 @@
 import os
 import json
 
-CONFIG_FILENAME = ".mediaCompConfig.json"
+CONFIG_FILENAME = ".mediaCompConfig"
 DEFAULT_CONFIG = {
     "CONFIG_WRAPPIXELVALUES": False,
     "CONFIG_MEDIA_PATH": "",
