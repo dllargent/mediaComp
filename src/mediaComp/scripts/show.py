@@ -200,7 +200,7 @@ class MainWindow(wx.Frame):
 
 def main():
     modules_found = []
-    for module_name in ['package', 'package.core', 'package.models']:
+    for module_name in ['mediaComp', 'mediaComp.core', 'mediaComp.models']:
         if module_name in sys.modules:
             modules_found.append(module_name)
     
