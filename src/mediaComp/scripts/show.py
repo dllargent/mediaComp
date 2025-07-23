@@ -3,11 +3,9 @@
 import wx
 import sys
 import pickle
-from threading import Thread, Event
+from threading import Thread
 import traceback
 import os
-import select
-import time
 
 script_dir = os.path.dirname(os.path.abspath(__file__))  
 package_dir = os.path.dirname(script_dir)  
@@ -42,36 +40,26 @@ except ImportError:
 
 
 class Listener(Thread):
-    """Listener Thread Class with proper cleanup"""
+    """Listener Thread Class"""
 
     def __init__(self, notifyWindow):
         Thread.__init__(self)
         self.notifyWindow = notifyWindow
         self.daemon = True
-        self._stop_event = Event()
         self._running = True
         self.start()
 
     def run(self):
         try:
-            while self._running and not self._stop_event.is_set():
+            while self._running:
                 try:
-                    # Use select to check if data is available (Unix/Linux/Mac)
-                    if hasattr(select, 'select'):
-                        ready, _, _ = select.select([sys.stdin], [], [], 0.1)
-                        if not ready:
-                            continue
-                    
-                    # Set stdin to non-blocking mode temporarily
                     control = sys.stdin.buffer.read(1)
                     if not control:
-                        if not self._stop_event.is_set():
-                            wx.CallAfter(self.notifyWindow.on_program_ended)
+                        wx.CallAfter(self.notifyWindow.on_program_ended)
                         break
                     
                     if control == bytes([0]):
-                        if not self._stop_event.is_set():
-                            wx.CallAfter(self.notifyWindow.on_shutdown)
+                        wx.CallAfter(self.notifyWindow.on_shutdown)
                         break
                     elif control == bytes([1]):
                         size_bytes = sys.stdin.buffer.read(8)
@@ -86,7 +74,7 @@ class Listener(Thread):
                         
                         payload = b''
                         bytes_read = 0
-                        while bytes_read < size and not self._stop_event.is_set():
+                        while bytes_read < size:
                             chunk = sys.stdin.buffer.read(min(4096, size - bytes_read))
                             if not chunk:
                                 print("Incomplete payload data received", file=sys.stderr)
@@ -94,45 +82,26 @@ class Listener(Thread):
                             payload += chunk
                             bytes_read += len(chunk)
                         
-                        if len(payload) == size and not self._stop_event.is_set():
+                        if len(payload) == size:
                             wx.CallAfter(self.notifyWindow.on_new_picture, payload)
-                        elif not self._stop_event.is_set():
+                        else:
                             print(f"Payload size mismatch: expected {size}, got {len(payload)}", file=sys.stderr)
                     else:
                         print(f"Unexpected control byte: {control[0]}", file=sys.stderr)
                         
                 except EOFError:
                     print("EOF in listener thread - program ended", file=sys.stderr)
-                    if not self._stop_event.is_set():
-                        wx.CallAfter(self.notifyWindow.on_program_ended)
-                    break
-                except OSError as e:
-                    # Handle broken pipe or other OS errors gracefully
-                    if e.errno == 32:  # Broken pipe
-                        print("Broken pipe - parent process ended", file=sys.stderr)
-                    else:
-                        print(f"OS error in listener: {e}", file=sys.stderr)
+                    wx.CallAfter(self.notifyWindow.on_program_ended)
                     break
                 except Exception as e:
-                    if not self._stop_event.is_set():
-                        print(f"Listener error: {e}", file=sys.stderr)
-                        traceback.print_exc(file=sys.stderr)
+                    print(f"Listener error: {e}", file=sys.stderr)
+                    traceback.print_exc(file=sys.stderr)
                     break
-        except Exception as e:
-            print(f"Listener thread exception: {e}", file=sys.stderr)
         finally:
-            print("Listener thread ending", file=sys.stderr)
+            pass
 
     def stop(self):
-        """Signal the thread to stop and wait for it to finish"""
         self._running = False
-        self._stop_event.set()
-        
-        # Give the thread a chance to finish gracefully
-        if self.is_alive():
-            self.join(timeout=1.0)  # Wait up to 1 second
-            if self.is_alive():
-                print("Warning: Listener thread did not stop gracefully", file=sys.stderr)
 
 
 class MainWindow(wx.Frame):
@@ -142,7 +111,6 @@ class MainWindow(wx.Frame):
         
         self.panel = wx.Panel(self)
         self.imageCtrl = None  
-        self.listener = None
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.panel.SetSizer(self.sizer)
@@ -153,58 +121,35 @@ class MainWindow(wx.Frame):
         self.SetClientSize((300, 100))
         self.Center()
 
-        # Start the listener thread
         self.listener = Listener(self)
 
-        # Bind close event
         self.Bind(wx.EVT_CLOSE, self.on_close)
-        
-        # Also bind to window destroy to ensure cleanup
-        self.Bind(wx.EVT_WINDOW_DESTROY, self.on_destroy)
 
         self.Show()
 
     def on_close(self, event):
-        """Handle window close event"""
-        print("Window closing...", file=sys.stderr)
-        self.cleanup_listener()
-        
-        # Allow the window to close
-        event.Skip()
-
-    def on_destroy(self, event):
-        """Handle window destroy event"""
-        print("Window being destroyed...", file=sys.stderr)
-        self.cleanup_listener()
-        event.Skip()
-
-    def cleanup_listener(self):
-        """Clean up the listener thread"""
-        if hasattr(self, 'listener') and self.listener is not None:
-            print("Stopping listener thread...", file=sys.stderr)
+        if hasattr(self, 'listener'):
             self.listener.stop()
-            self.listener = None
+        event.Skip()
 
     def on_program_ended(self):
-        """Called when the program that's sending data ends"""
-        self.cleanup_listener()
+        if hasattr(self, 'listener'):
+            self.listener.stop()
         
         current_title = self.GetTitle()
         if not current_title.endswith(" - Complete"):
             self.SetTitle(current_title + " - Complete")
 
     def on_shutdown_signal(self):
-        """Called when shutdown signal is received"""
-        self.cleanup_listener()
+        if hasattr(self, 'listener'):
+            self.listener.stop()
         
         current_title = self.GetTitle()
         if not current_title.endswith(" - Complete"):
             self.SetTitle(current_title + " - Complete")
 
     def on_shutdown(self):
-        """Called to shutdown the application"""
-        self.cleanup_listener()
-        wx.CallAfter(self.Close)
+        self.Close()
 
     def on_new_picture(self, pickled_picture):
         try:            
@@ -253,15 +198,6 @@ class MainWindow(wx.Frame):
             traceback.print_exc(file=sys.stderr)
 
 
-class ImageViewerApp(wx.App):
-    """Custom App class to handle cleanup on exit"""
-    
-    def OnExit(self):
-        """Called when the application is about to exit"""
-        print("Application exiting...", file=sys.stderr)
-        return super().OnExit()
-
-
 def main():
     modules_found = []
     for module_name in ['mediaComp', 'mediaComp.core', 'mediaComp.models']:
@@ -277,17 +213,9 @@ def main():
     except:
         print("Warning: Cannot check for makePicture function", file=sys.stderr)
     
-    # Use custom app class
-    app = ImageViewerApp(False)
-    
-    try:
-        window = MainWindow(parent=None)
-        app.MainLoop()
-    except Exception as e:
-        print(f"Application error: {e}", file=sys.stderr)
-        traceback.print_exc(file=sys.stderr)
-    finally:
-        print("Application finished", file=sys.stderr)
+    app = wx.App(False)
+    MainWindow(parent=None)
+    app.MainLoop()
 
 if __name__ == '__main__':
     main()
