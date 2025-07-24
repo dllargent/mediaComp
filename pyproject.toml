@@ -38,5 +38,6 @@ Issues = "https://github.com/dllargent/mediaComp/issues"
 exclude = [
   "*.docx",
   "**/__pycache__",
-  "test.py"
+  "test.py",
+  "dev/"
 ]

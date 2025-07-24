@@ -807,14 +807,38 @@ class Picture:
         self.process.stdin.flush()
     
     def show(self):
-        """Show a picture using stand-alone Python script
-        """
-
         self.__saveInTempFile()
 
         if self.process is None or self.process.poll() is not None:
-            # a show process for this pic is not running, start a new one
-            self.process = self.__runScript('scripts/show.py')
+            script_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "scripts/show.py")
+            
+            python_exe = sys.executable
+            
+            env = os.environ.copy()
+            
+            src_dir = os.path.dirname(os.path.dirname(__file__))  
+            current_pythonpath = env.get('PYTHONPATH', '')
+            
+            new_pythonpath_parts = [src_dir]
+            if current_pythonpath:
+                new_pythonpath_parts.append(current_pythonpath)
+            
+            env['PYTHONPATH'] = os.pathsep.join(new_pythonpath_parts)
+            try:
+                process = subprocess.Popen(
+                    [python_exe, script_path],
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    env=env,  
+                    bufsize=0  
+                )
+                
+                self.process = process
+                
+            except Exception as e:
+                print(f"Error starting subprocess: {e}", file=sys.stderr)
+                raise
         self.__sendPickledPicture()
 
     def repaint(self):
