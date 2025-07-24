@@ -295,19 +295,54 @@ def soundGUI(soundPlot, sound):
     window.title("Sound Explorer")
     window.geometry("900x700")
     window.configure(bg = "#9A9999")
-    soundObj = pygame.mixer.Sound(buffer=sound.getBuffer())
+    
+    # Bring window to front immediately
+    window.lift()
+    window.attributes('-topmost', True)
+    window.after_idle(lambda: window.attributes('-topmost', False))
+    window.focus_force()
 
+    def play_sound():
+        try:
+            # Ensure pygame mixer is properly initialized with correct parameters
+            pygame.mixer.quit()  # Clean slate
+            size = -16 if sound.sampleWidth == 2 else -8  # Signed 16-bit or 8-bit
+            pygame.mixer.init(frequency=sound.sampleRate, 
+                            size=size, 
+                            channels=sound.numChannels, 
+                            buffer=512)
+            
+            soundObj = pygame.mixer.Sound(buffer=sound.buffer)
+            soundObj.play()
+            
+        except Exception as e:
+            print(f"Playback error: {e}")
+            try:
+                if sound.soundMix:
+                    sound.soundMix.play()
+            except:
+                print("Both playback methods failed")
+    
     def on_closing():
-        soundObj.stop()
+        try:
+            if sound.soundMix:
+                sound.soundMix.stop()
+            sound.stopPlaying()
+        except:
+            pass
         window.quit()
         window.destroy()
 
     window.protocol("WM_DELETE_WINDOW", on_closing)
-    button = tk.Button(window, width=12 ,text="Play Sound", bg="gray",command=lambda: soundObj.play())
+    
+    button = tk.Button(window, width=12, text="Play", bg="gray", 
+                      command=play_sound)
     button.pack()
+    
     frame = tk.Frame(window, bg = "#9A9999")
     canvas = FigureCanvasTkAgg(figure=soundPlot, master=frame)
     frame.pack(padx = 10, pady = 10, fill = "both") 
     canvas.get_tk_widget().pack()
     canvas.draw()
+    
     window.mainloop()
