@@ -307,7 +307,7 @@ def soundGUI(soundPlot, sound):
             # Ensure pygame mixer is properly initialized with correct parameters
             pygame.mixer.quit()  # Clean slate
             size = -16 if sound.sampleWidth == 2 else -8  # Signed 16-bit or 8-bit
-            pygame.mixer.init(frequency=sound.sampleRate, 
+            pygame.mixer.init(frequency=sound.getSamplingRate, 
                             size=size, 
                             channels=sound.numChannels, 
                             buffer=512)
