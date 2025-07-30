@@ -8,6 +8,7 @@ from .utils import getShortPath
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
+from ..models.SoundExplorer import SoundExplorer
 
 def samplesToSound(samples):
     maxIndex = max([getIndex(s) for s in samples])
@@ -264,6 +265,8 @@ def soundTool(sound):
     #     raise ValueError
     
     soundGUI(createSoundPlot(sound), sound)
+    #explore = SoundExplorer(sound)
+    #explore.show()
     
 def createSoundPlot(sound):
     try:
@@ -290,7 +293,7 @@ def createSoundPlot(sound):
 
     return figure
 
-def soundGUI(soundPlot, sound):
+def soundGUI(soundPlot, sound:Sound):
     window = tk.Tk()
     window.title("Sound Explorer")
     window.geometry("900x700")
@@ -307,7 +310,7 @@ def soundGUI(soundPlot, sound):
             # Ensure pygame mixer is properly initialized with correct parameters
             pygame.mixer.quit()  # Clean slate
             size = -16 if sound.sampleWidth == 2 else -8  # Signed 16-bit or 8-bit
-            pygame.mixer.init(frequency=sound.getSamplingRate, 
+            pygame.mixer.init(frequency=int(sound.getSamplingRate()/2), 
                             size=size, 
                             channels=sound.numChannels, 
                             buffer=512)

@@ -601,3 +601,7 @@ class Sound:
         file.setframerate(self.sampleRate)
         file.writeframes(self.buffer)
         file.close()
+
+    def setSoundExplorer(self, soundExplorer):
+        from .SoundExplorer import SoundExplorer
+        self.soundExplorer = soundExplorer
