@@ -20,7 +20,7 @@ __all__ = [
     "getSampleValue", "getSound", "getNumSamples", "getDuration", "writeSoundTo", "randomSamples", "getIndex", 
     "playNote", "turn", "turnRight", "turnToFace", "turnLeft", "forward", "backward", "moveTo", "makeTurtle", "penUp", 
     "penDown", "drop", "getXPos", "getYPos", "getHeading", "makeWorld", "getTurtleList", "blue", "red", 
-    "green", "gray", "darkGray", "lightGray", "yellow", "orange", "pink", "magenta", "cyan"
+    "green", "gray", "darkGray", "lightGray", "yellow", "orange", "pink", "magenta", "cyan", "white", "black"
 ]
 
 config = ConfigManager()
