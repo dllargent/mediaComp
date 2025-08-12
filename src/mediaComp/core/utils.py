@@ -134,45 +134,100 @@ def calculateNeededFiller(message, width=100):
         fillerNeeded = 0
     return fillerNeeded * " "
 
-
 def requestNumber(message):
+    result = {"value": None}
+
+    def submit():
+        result["value"] = entry.get()
+        root.destroy()
+
     root = tk.Tk()
-    root.withdraw()
-    filler = calculateNeededFiller(message, 60)
-    userInput = simpledialog.askfloat("Enter a number", message + filler)
-    root.destroy()
-    return userInput
+    root.title("Enter a number")
+    root.geometry("250x100")
+
+    tk.Label(root, text=message).pack(pady=10)
+    entry = tk.Entry(root, width=30)
+    entry.pack(pady=5)
+
+    tk.Button(root, text="Submit", command=submit).pack(pady=5)
+    root.mainloop()
+    return result["value"]
 
 
 def requestInteger(message):
+    result = {"value": None}
+
+    def submit():
+        result["value"] = entry.get()
+        root.destroy()
+
     root = tk.Tk()
-    root.withdraw()
-    filler = calculateNeededFiller(message, 60)
-    userInput = simpledialog.askinteger("Enter an integer", message + filler)
-    root.destroy()
-    return userInput
+    root.title("Enter a integer")
+    root.geometry("250x100")
+
+    tk.Label(root, text=message).pack(pady=10)
+    entry = tk.Entry(root, width=30)
+    entry.pack(pady=5)
+
+    tk.Button(root, text="Submit", command=submit).pack(pady=5)
+    root.mainloop()
+    return result["value"]
 
 
 def requestIntegerInRange(message, min, max):
-
     if min >= max:
-        print("requestIntegerInRange(message, min, max): min >= max not allowed")
-        raise ValueError
+        raise ValueError("min_val >= max_val not allowed")
+
+    result = {"value": None}
+
+    def submit():
+        try:
+            value = int(entry.get())
+            if min <= value <= max:
+                result["value"] = value
+                root.quit()
+                root.destroy()
+            else:
+                error_label.config(text=f"Enter a number between {min} and {max}")
+        except ValueError:
+            error_label.config(text="Please enter a valid integer")
+
     root = tk.Tk()
-    root.withdraw()
-    filler = calculateNeededFiller(message, 80)
-    userInput = simpledialog.askinteger("Enter an integer in a range", message + filler, minvalue=min, maxvalue=max)
-    root.destroy()
-    return userInput
+    root.title("Enter an Integer")
+    root.geometry("300x150")
+    root.resizable(False, False)
+
+    tk.Label(root, text = (message + " " + str(min) + "-" + str(max))).pack(pady=(10, 5))
+    entry = tk.Entry(root, width=20)
+    entry.pack(pady=5)
+    entry.focus_set()
+
+    tk.Button(root, text="Submit", command=submit).pack(pady=5)
+    error_label = tk.Label(root, text="", fg="red")
+    error_label.pack()
+
+    root.mainloop()
+    return result["value"]
 
 
 def requestString(message):
+    result = {"value": None}
+
+    def submit():
+        result["value"] = entry.get()
+        root.destroy()
+
     root = tk.Tk()
-    root.withdraw()
-    filler = calculateNeededFiller(message)
-    userInput = simpledialog.askstring("Enter a string", message + filler)
-    root.destroy()
-    return userInput
+    root.title("Enter a string")
+    root.geometry("250x100")
+
+    tk.Label(root, text=message).pack(pady=10)
+    entry = tk.Entry(root, width=30)
+    entry.pack(pady=5)
+
+    tk.Button(root, text="Submit", command=submit).pack(pady=5)
+    root.mainloop()
+    return result["value"]
 
 def showWarning(message):
     root = tk.Tk()
