@@ -136,15 +136,25 @@ def calculateNeededFiller(message, width=100):
 
 def _center_window(root, width, height):
     root.update_idletasks()
-    x = (root.winfo_screenwidth() // 2) - (width // 2)
-    y = (root.winfo_screenheight() // 2) - (height // 2)
+    
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    
+    x = (screen_width - width) // 2
+    y = (screen_height - height) // 2
+    
+    x = max(0, x)
+    y = max(0, y)
+    
     root.geometry(f"{width}x{height}+{x}+{y}")
+    root.update_idletasks()
 
 
 def _bring_to_front(root):
     root.lift()
     root.attributes("-topmost", True)
     root.after_idle(root.attributes, "-topmost", False)
+    
 
 def requestNumber(message):
     result = {"value": None}
@@ -159,9 +169,6 @@ def requestNumber(message):
 
     root = tk.Tk()
     root.title("Enter a Number")
-    _center_window(root, 250, 100)
-    _bring_to_front(root)
-    root.protocol("WM_DELETE_WINDOW", on_close)
 
     tk.Label(root, text=message).pack(pady=10)
     entry = tk.Entry(root, width=30)
@@ -169,6 +176,10 @@ def requestNumber(message):
     entry.focus_set()
 
     tk.Button(root, text="Submit", command=submit).pack(pady=5)
+    _center_window(root, 250, 100)
+    root.deiconify()  
+    _bring_to_front(root)
+    root.protocol("WM_DELETE_WINDOW", on_close)
 
     root.mainloop()
     return result["value"]
