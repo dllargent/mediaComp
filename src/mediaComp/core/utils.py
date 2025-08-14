@@ -154,14 +154,19 @@ def _bring_to_front(root):
     root.lift()
     root.attributes("-topmost", True)
     root.after_idle(root.attributes, "-topmost", False)
+    root.focus_force()
+    root.grab_set()
     
 
 def requestNumber(message):
     result = {"value": None}
 
     def submit():
-        result["value"] = entry.get()
-        root.destroy()
+        try:
+            result["value"] = int(entry.get())
+            root.destroy()
+        except ValueError:
+            error_label.config(text="Please enter a valid number")
 
     def on_close():
         result["value"] = None
@@ -169,17 +174,21 @@ def requestNumber(message):
 
     root = tk.Tk()
     root.title("Enter a Number")
+    root.resizable(False, False)
+    _center_window(root, 250, 120)
+    _bring_to_front(root)
+    root.protocol("WM_DELETE_WINDOW", on_close)
 
-    tk.Label(root, text=message).pack(pady=10)
+    tk.Label(root, text=message).pack(pady=(10, 5))
     entry = tk.Entry(root, width=30)
     entry.pack(pady=5)
     entry.focus_set()
 
+    entry.bind("<Return>", lambda event: submit())
+
     tk.Button(root, text="Submit", command=submit).pack(pady=5)
-    _center_window(root, 250, 100)
-    root.deiconify()  
-    _bring_to_front(root)
-    root.protocol("WM_DELETE_WINDOW", on_close)
+    error_label = tk.Label(root, text="", fg="red")
+    error_label.pack()
 
     root.mainloop()
     return result["value"]
@@ -201,14 +210,17 @@ def requestInteger(message):
 
     root = tk.Tk()
     root.title("Enter an Integer")
+    root.resizable(False, False)
     _center_window(root, 250, 120)
     _bring_to_front(root)
     root.protocol("WM_DELETE_WINDOW", on_close)
+
 
     tk.Label(root, text=message).pack(pady=(10, 5))
     entry = tk.Entry(root, width=30)
     entry.pack(pady=5)
     entry.focus_set()
+    entry.bind("<Return>", lambda event: submit())
 
     tk.Button(root, text="Submit", command=submit).pack(pady=5)
     error_label = tk.Label(root, text="", fg="red")
@@ -241,6 +253,7 @@ def requestIntegerInRange(message, min_val, max_val):
 
     root = tk.Tk()
     root.title("Enter an Integer in Range")
+    root.resizable(False, False)
     _center_window(root, 300, 150)
     _bring_to_front(root)
     root.protocol("WM_DELETE_WINDOW", on_close)
@@ -249,6 +262,8 @@ def requestIntegerInRange(message, min_val, max_val):
     entry = tk.Entry(root, width=20)
     entry.pack(pady=5)
     entry.focus_set()
+
+    entry.bind("<Return>", lambda event: submit())
 
     tk.Button(root, text="Submit", command=submit).pack(pady=5)
     error_label = tk.Label(root, text="", fg="red")
@@ -271,6 +286,7 @@ def requestString(message):
 
     root = tk.Tk()
     root.title("Enter a String")
+    root.resizable(False, False)
     _center_window(root, 250, 100)
     _bring_to_front(root)
     root.protocol("WM_DELETE_WINDOW", on_close)
@@ -280,6 +296,8 @@ def requestString(message):
     entry.pack(pady=5)
     entry.focus_set()
 
+    entry.bind("<Return>", lambda event: submit())
+
     tk.Button(root, text="Submit", command=submit).pack(pady=5)
 
     root.mainloop()
@@ -287,24 +305,13 @@ def requestString(message):
 
 
 def showWarning(message):
-    root = tk.Tk()
-    root.withdraw()
-    _bring_to_front(root)
-    messagebox.showwarning("Warning", message, parent=root)
-    root.destroy()
+    messagebox.showwarning("Warning", message)
 
 
 def showInformation(message):
-    root = tk.Tk()
-    root.withdraw()
-    _bring_to_front(root)
-    messagebox.showinfo("Information", message, parent=root)
-    root.destroy()
+    messagebox.showinfo("Information", message)
+
 
 
 def showError(message):
-    root = tk.Tk()
-    root.withdraw()
-    _bring_to_front(root)
-    messagebox.showerror("Error", message, parent=root)
-    root.destroy()
+    messagebox.showerror("Error", message)
