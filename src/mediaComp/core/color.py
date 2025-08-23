@@ -14,16 +14,16 @@ pink = Color(255, 175, 175)
 magenta = Color(255, 0, 255)
 cyan = Color(0, 255, 255)
 
-def setColorWrapAround(setting):
+def setColorWrapAround(setting)-> None:
     Pixel.setWrapLevels(bool(setting))
 
-def getColorWrapAround():
+def getColorWrapAround() -> bool:
     return Pixel.getWrapLevels()
 
-def pickAColor():
+def pickAColor() -> Color:
     return Color.pickAColor()
 
-def distance(c1, c2):
+def distance(c1, c2) -> float:
     if not isinstance(c1, Color):
         print("distance(c1,c2): First input is not a color")
         raise ValueError
@@ -32,19 +32,19 @@ def distance(c1, c2):
         raise ValueError
     return c1.distance(c2)
 
-def makeDarker(color):
+def makeDarker(color) -> Color:
     if not isinstance(color, Color):
         print("makeDarker(color): Input is not a color")
         raise ValueError
     return Color(color.makeDarker())
 
-def makeLighter(color):
+def makeLighter(color) -> Color:
     if not isinstance(color, Color):
         print("makeLighter(color): Input is not a color")
         raise ValueError
     return Color(color.makeLighter())
 
 
-def makeColor(red, green=None, blue=None):
+def makeColor(red, green=None, blue=None) -> Color:
     return Color(red, green, blue)
 

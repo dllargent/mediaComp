@@ -10,7 +10,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 from ..models.SoundExplorer import SoundExplorer
 
-def samplesToSound(samples):
+def samplesToSound(samples) -> Sound:
     maxIndex = max([getIndex(s) for s in samples])
     newSound = makeEmptySound(maxIndex + 1, int(getSamplingRate(samples[0].getSound())))
     for s in samples:
@@ -18,7 +18,7 @@ def samplesToSound(samples):
         setSampleValueAt(newSound, x, getSampleValue(s))
     return newSound
 
-def makeSound(filename):
+def makeSound(filename) -> Sound:
     global mediaFolder
     if not isinstance(filename, str):
         return samplesToSound(filename)
@@ -29,7 +29,7 @@ def makeSound(filename):
         raise ValueError
     return Sound(filename)
 
-def makeEmptySound(numSamples, samplingRate=Sound.SAMPLE_RATE, filename=None):
+def makeEmptySound(numSamples, samplingRate=Sound.SAMPLE_RATE, filename=None) -> Sound:
     numSamples = int(numSamples)
     if numSamples <= 0 or samplingRate <= 0:
         print("makeEmptySound(numSamples[, samplingRate]): numSamples and samplingRate must each be greater than 0")
@@ -39,7 +39,7 @@ def makeEmptySound(numSamples, samplingRate=Sound.SAMPLE_RATE, filename=None):
         raise ValueError
     return Sound(numSamples, samplingRate, filename)
 
-def makeEmptySoundBySeconds(seconds, samplingRate=Sound.SAMPLE_RATE):
+def makeEmptySoundBySeconds(seconds, samplingRate=Sound.SAMPLE_RATE) -> Sound:
     if seconds <= 0 or samplingRate <= 0:
         print("makeEmptySoundBySeconds(numSamples[, samplingRate]): numSamples and samplingRate must each be greater than 0")
         raise ValueError
@@ -48,62 +48,62 @@ def makeEmptySoundBySeconds(seconds, samplingRate=Sound.SAMPLE_RATE):
         raise ValueError
     return Sound(seconds * samplingRate, samplingRate)
 
-def duplicateSound(sound):
+def duplicateSound(sound) -> Sound:
     if not isinstance(sound, Sound):
         print("duplicateSound(sound): Input is not a sound")
         raise ValueError
     return Sound(sound)
 
 
-def getSamples(sound):
+def getSamples(sound) -> Samples:
     if not isinstance(sound, Sound):
         print("getSamples(sound): Input is not a sound")
         raise ValueError
     return Samples.getSamples(sound)
 
 
-def play(sound):
+def play(sound) -> None:
     if not isinstance(sound, Sound):
         print("play(sound): Input is not a sound")
         raise ValueError
     sound.play()
 
 
-def blockingPlay(sound):
+def blockingPlay(sound) -> None:
     if not isinstance(sound, Sound):
         print("blockingPlay(sound): Input is not a sound")
         raise ValueError
     sound.blockingPlay()
 
-def threadedPlay(sound):
+def threadedPlay(sound) -> None:
     if not isinstance(sound, Sound):
         print("threadedPlay(sound): Input is not a sound")
         raise ValueError
     threading.Thread(target = lambda: sound.blockingPlay(), daemon = True).start()
 
 
-def stopPlaying(sound):
+def stopPlaying(sound) -> None:
     if not isinstance(sound, Sound):
         print("stopPlaying(sound): Input is not a sound")
         raise ValueError
     sound.stopPlaying()
 
 
-def playAtRate(sound, rate):
+def playAtRate(sound, rate) -> None:
     if not isinstance(sound, Sound):
         print("playAtRate(sound,rate): First input is not a sound")
         raise ValueError
     sound.playAtRateDur(rate, sound.getLength())
 
 
-def playAtRateDur(sound, rate, dur):
+def playAtRateDur(sound, rate, dur) -> None:
     if not isinstance(sound, Sound):
         print("playAtRateDur(sound,rate,dur): First input is not a sound")
         raise ValueError
     sound.playAtRateDur(rate, dur)
 
 
-def playInRange(sound, start, stop):
+def playInRange(sound, start, stop) -> None:
     if not isinstance(sound, Sound):
         print("playInRange(sound,start,stop): First input is not a sound")
         raise ValueError
@@ -111,7 +111,7 @@ def playInRange(sound, start, stop):
         1, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset)
 
 
-def blockingPlayInRange(sound, start, stop):
+def blockingPlayInRange(sound, start, stop) -> None:
     if not isinstance(sound, Sound):
         print("blockingPlayInRange(sound,start,stop): First input is not a sound")
         raise ValueError
@@ -119,7 +119,7 @@ def blockingPlayInRange(sound, start, stop):
         1, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset)
 
 
-def playAtRateInRange(sound, rate, start, stop):
+def playAtRateInRange(sound, rate, start, stop) -> None:
     if not isinstance(sound, Sound):
         print("playAtRateInRAnge(sound,rate,start,stop): First input is not a sound")
         raise ValueError
@@ -127,7 +127,7 @@ def playAtRateInRange(sound, rate, start, stop):
         rate, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset)
 
 
-def blockingPlayAtRateInRange(sound, rate, start, stop):
+def blockingPlayAtRateInRange(sound, rate, start, stop) -> None:
     if not isinstance(sound, Sound):
         print("blockingPlayAtRateInRange(sound,rate,start,stop): First input is not a sound")
         raise ValueError
@@ -141,7 +141,7 @@ def getSamplingRate(sound):
     return sound.getSamplingRate()
 
 
-def setSampleValueAt(sound, index, value):
+def setSampleValueAt(sound, index, value) -> None:
     if not isinstance(sound, Sound):
         print("setSampleValueAt(sound,index,value): First input is not a sound")
         raise ValueError
@@ -155,7 +155,7 @@ def setSampleValueAt(sound, index, value):
     sound.setSampleValue(index - Sound._SoundIndexOffset, int(value))
 
 
-def getSampleValueAt(sound, index):
+def getSampleValueAt(sound, index) -> int:
     if not isinstance(sound, Sound):
         print("getSampleValueAt(sound,index): First input is not a sound")
         raise ValueError
@@ -168,7 +168,7 @@ def getSampleValueAt(sound, index):
     return sound.getSampleValue(index - Sound._SoundIndexOffset)
 
 
-def setSampleValue(sample, value):
+def setSampleValue(sample, value) -> None:
     if not isinstance(sample, Sample):
         print("setSample(sample,value): First input is not a sample")
         raise ValueError
@@ -179,32 +179,32 @@ def setSampleValue(sample, value):
     return sample.setValue(int(value))
 
 
-def getSampleValue(sample):
+def getSampleValue(sample) -> int:
     if not isinstance(sample, Sample):
         print("getSample(sample): Input is not a sample")
         raise ValueError
     return sample.getValue()
 
-def getSound(sample):
+def getSound(sample) -> Sound:
     if not isinstance(sample, Sample):
         print("getSound(sample): Input is not a sample")
         raise ValueError
     return sample.getSound()
 
-def getNumSamples(sound):
+def getNumSamples(sound) -> int:
     if not isinstance(sound, Sound):
         print("getLength(sound): Input is not a sound")
         raise ValueError
     return sound.getLength()
 
-def getDuration(sound):
+def getDuration(sound) -> float:
     if not isinstance(sound, Sound):
         print("getDuration(sound): Input is not a sound")
         raise ValueError
     return sound.getLength() / sound.getSamplingRate()
 
 
-def writeSoundTo(sound, filename):
+def writeSoundTo(sound, filename) -> None:
     global mediaFolder
     if not os.path.isabs(filename):
         filename = mediaFolder + filename
@@ -214,7 +214,7 @@ def writeSoundTo(sound, filename):
     sound.writeToFile(filename)
 
 
-def randomSamples(someSound, number):
+def randomSamples(someSound, number) -> Sound:
     samplelist = []
     samples = getSamples(someSound)
     for count in range(number):
@@ -222,10 +222,10 @@ def randomSamples(someSound, number):
     if(isinstance(samplesToSound(samplelist), Sound)):
         soundTool
 
-def getIndex(sample):
+def getIndex(sample) -> int:
     return int(str(sample).split()[2])
 
-def playNote(note, duration, intensity=64):
+def playNote(note, duration, intensity=64) -> None:
     if not (0 <= note <= 127):
         raise ValueError("playNote(): Note must be between 0 and 127.")
     if not (0 <= intensity <= 127):
@@ -241,7 +241,7 @@ def playNote(note, duration, intensity=64):
         del midi_out	
         pygame.midi.quit()
 
-def soundTool(sound):
+def soundTool(sound) -> None:
     # if isinstance(sound, Sound):
     #     samplesList = list(map(getSampleValue,getSamples(sound)))
     #     try:
@@ -268,7 +268,7 @@ def soundTool(sound):
     #explore = SoundExplorer(sound)
     #explore.show()
     
-def createSoundPlot(sound):
+def createSoundPlot(sound) -> plt.Figure:
     try:
         samplesList = list(map(getSampleValue, getSamples(sound)))
         fileName = getShortPath(sound.getFileName())
@@ -293,7 +293,7 @@ def createSoundPlot(sound):
 
     return figure
 
-def soundGUI(soundPlot, sound:Sound):
+def soundGUI(soundPlot, sound:Sound) -> None:
     window = tk.Tk()
     window.title("Sound Explorer")
     window.geometry("900x700")

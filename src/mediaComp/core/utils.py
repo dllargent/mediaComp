@@ -7,7 +7,7 @@ from ..models.Config import ConfigManager
 
 config = ConfigManager() 
 
-def setMediaFolder(path=None):
+def setMediaFolder(path=None) -> str:
     if path is None:
         pickMediaPath()
     elif os.path.exists(path):
@@ -16,16 +16,16 @@ def setMediaFolder(path=None):
         config.setMediaPath("C:\\")
     return config.getMediaPath()
 
-def setTestMediaFolder():
+def setTestMediaFolder() -> str:
     config.setMediaPath(os.getcwd() + os.sep)
 
-def getMediaFolder(filename=""):
+def getMediaFolder(filename="") -> str:
     return config.getMediaPath(filename)
 
-def showMediaFolder():
+def showMediaFolder() -> None:
     print("The media path is currently:", config.getMediaPath())
 
-def getShortPath(filename):
+def getShortPath(filename) -> str:
     dirs = filename.split(os.sep)
     if len(dirs) < 1:
         return "."
@@ -34,7 +34,7 @@ def getShortPath(filename):
     else:
         return os.path.join(dirs[-2], dirs[-1])
 
-def setLibFolder(directory=None):
+def setLibFolder(directory=None) -> str:
     if directory is None:
         directory = pickAFolder()
     if os.path.isdir(directory):
@@ -43,7 +43,7 @@ def setLibFolder(directory=None):
         raise ValueError("There is no directory at " + directory)
     return directory
 
-def pickAFile():
+def pickAFile() -> str:
     directory = config.getSessionPath()
     scriptpath = os.path.join(config.getMEDIACOMPPath(), 'scripts', 'filePicker.py')
     path = subprocess.check_output([sys.executable, scriptpath, 'file', directory]).decode().strip()
@@ -52,7 +52,7 @@ def pickAFile():
         return path
     return None
 
-def pickAFolder():
+def pickAFolder() -> str:
     directory = config.getSessionPath()
     scriptpath = os.path.join(config.getMEDIACOMPPath(), 'scripts', 'filePicker.py')
     path = subprocess.check_output([sys.executable, scriptpath, 'folder', directory]).decode().strip()
@@ -61,12 +61,12 @@ def pickAFolder():
         return os.path.join(path, '')
     return None
 
-def pickMediaPath():
+def pickMediaPath() -> None:
     path = pickAFolder()
     if path:
         config.setMediaPath(path)
 
-def calculateNeededFiller(message, width=100):
+def calculateNeededFiller(message, width=100) -> str:
     fillerNeeded = width - len(message)
     if fillerNeeded < 0:
         fillerNeeded = 0
@@ -88,7 +88,7 @@ def _center_window(root, width, height):
     root.update_idletasks()
 
 
-def _bring_to_front(root):
+def _bring_to_front(root) -> None:
     root.lift()
     root.attributes("-topmost", True)
     root.after_idle(root.attributes, "-topmost", False)
@@ -96,7 +96,7 @@ def _bring_to_front(root):
     root.grab_set()
     
 
-def requestNumber(message):
+def requestNumber(message) -> float:
     result = {"value": None}
 
     def submit():
@@ -132,7 +132,7 @@ def requestNumber(message):
     return result["value"]
 
 
-def requestInteger(message):
+def requestInteger(message) -> int:
     result = {"value": None}
 
     def submit():
@@ -168,7 +168,7 @@ def requestInteger(message):
     return result["value"]
 
 
-def requestIntegerInRange(message, min_val, max_val):
+def requestIntegerInRange(message, min_val, max_val) -> int:
     if min_val >= max_val:
         raise ValueError("min_val >= max_val not allowed")
 
@@ -211,7 +211,7 @@ def requestIntegerInRange(message, min_val, max_val):
     return result["value"]
 
 
-def requestString(message):
+def requestString(message) -> str:
     result = {"value": None}
 
     def submit():
@@ -242,7 +242,7 @@ def requestString(message):
     return result["value"]
 
 
-def showWarning(message):
+def showWarning(message) -> None:
     #messagebox.showwarning("Warning", message)
 
     def on_close():
@@ -261,10 +261,10 @@ def showWarning(message):
 
     root.mainloop()
 
-def showInformation(message):
+def showInformation(message) -> None:
     messagebox.showinfo("Information", message)
 
 
 
-def showError(message):
+def showError(message) -> None:
     messagebox.showerror("Error", message)

@@ -2,7 +2,7 @@ from ..models.Movie import Movie
 import os
 
 
-def playMovie(movie):
+def playMovie(movie) -> None:
     if isinstance(movie, Movie):
         movie.play()
     else:
@@ -10,7 +10,7 @@ def playMovie(movie):
         raise ValueError
 
 
-def writeQuicktime(movie, destPath, framesPerSec=16):
+def writeQuicktime(movie, destPath, framesPerSec=16) -> None:
     if not (isinstance(movie, Movie)):
         print("writeQuicktime(movie, path[, framesPerSec]): First input is not a Movie")
         raise ValueError
@@ -20,7 +20,7 @@ def writeQuicktime(movie, destPath, framesPerSec=16):
     movie.writeQuicktime(destPath, framesPerSec)
 
 
-def writeAVI(movie, destPath, framesPerSec=16):
+def writeAVI(movie, destPath, framesPerSec=16) -> None:
     if not (isinstance(movie, Movie)):
         print("writeAVI(movie, path[, framesPerSec]): First input is not a Movie")
         raise ValueError
@@ -30,11 +30,11 @@ def writeAVI(movie, destPath, framesPerSec=16):
     movie.writeAVI(destPath, framesPerSec)
 
 
-def makeMovie():
+def makeMovie() -> Movie:
     return Movie()
 
 
-def makeMovieFromInitialFile(filename):
+def makeMovieFromInitialFile(filename) -> Movie:
     import re
     movie = Movie()
     global mediaFolder
@@ -55,7 +55,7 @@ def makeMovieFromInitialFile(filename):
     return movie
 
 
-def addFrameToMovie(a, b):
+def addFrameToMovie(a, b) -> None:
     frame = None
     movie = None
     if a.__class__ == Movie:
@@ -72,7 +72,7 @@ def addFrameToMovie(a, b):
     movie.addFrame(frame)
 
 
-def writeFramesToDirectory(movie, directory=None):
+def writeFramesToDirectory(movie, directory=None) -> None:
     if not isinstance(movie, Movie):
         print("writeFramesToDirectory(movie[, directory]): movie is not a Movie object")
         raise ValueError
