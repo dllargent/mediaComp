@@ -2,69 +2,7 @@ import os
 import sys
 import subprocess
 import tkinter as tk
-from tkinter import simpledialog
 from tkinter import messagebox
-
-'''
-def setMediaPath(file=None):
-    global mediaFolder
-    if(file == None):
-        FileChooser.pickMediaPath()
-    elif os.path.exists(file):
-        FileChooser.setMediaPath(file)
-    else:
-        FileChooser.setMediaPath("C:\\")
-    mediaFolder = getMediaPath()
-    return mediaFolder
-
-def getMediaPath(filename=""):
-    return str(FileChooser.getMediaPath(filename))
-
-def setMediaFolder(file=None):
-    return setMediaPath(file)
-
-def setTestMediaFolder():
-    global mediaFolder
-    mediaFolder = os.getcwd() + os.sep
-
-def getMediaFolder(filename=""):
-    return str(getMediaPath(filename))
-
-def showMediaFolder():
-    global mediaFolder
-    print("The media path is currently: ", mediaFolder)
-
-def getShortPath(filename):
-    dirs = filename.split(os.sep)
-    if len(dirs) < 1:
-        return "."
-    elif len(dirs) == 1:
-        return str(dirs[0])
-    else:
-        return str(dirs[len(dirs) - 2] + os.sep + dirs[len(dirs) - 1])
-    
-def setLibPath(directory=None):
-    if directory is None:
-        directory = pickAFolder()
-
-    if os.path.isdir(directory):
-        sys.path.insert(0, directory)
-    elif directory is not None:
-        raise ValueError("There is no directory at " + directory)
-
-    return directory
-
-
-def pickAFile():
-    return FileChooser.pickAFile()
-
-
-def pickAFolder():
-    dir = FileChooser.pickADirectory()
-    if (dir != None):
-        return dir
-    return None
-'''
 from ..models.Config import ConfigManager
 
 config = ConfigManager() 
@@ -305,8 +243,23 @@ def requestString(message):
 
 
 def showWarning(message):
-    messagebox.showwarning("Warning", message)
+    #messagebox.showwarning("Warning", message)
 
+    def on_close():
+        root.destroy()
+
+    root = tk.Tk()
+    root.title("Warning")
+    root.resizable(False, False)
+    _center_window(root, 250, 100)
+    _bring_to_front(root)
+    root.protocol("WM_DELETE_WINDOW", on_close)
+
+    tk.Label(root, text=message).pack(pady=10)
+
+    tk.Button(root, text="Okay", command=on_close).pack(pady=5)
+
+    root.mainloop()
 
 def showInformation(message):
     messagebox.showinfo("Information", message)
