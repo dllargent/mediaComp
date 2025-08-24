@@ -96,7 +96,7 @@ def _bring_to_front(root) -> None:
     root.grab_set()
     
 
-def requestNumber(message) -> float:
+def requestNumber(message) -> int:
     result = {"value": None}
 
     def submit():

@@ -134,7 +134,7 @@ def blockingPlayAtRateInRange(sound, rate, start, stop) -> None:
     sound.blockingPlayAtRateInRange(
         rate, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset)
     
-def getSamplingRate(sound):
+def getSamplingRate(sound) -> int:
     if not isinstance(sound, Sound):
         print("getSamplingRate(sound): Input is not a sound")
         raise ValueError

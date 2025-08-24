@@ -75,7 +75,7 @@ def getHeight(picture) -> int:
         raise ValueError
     return picture.getHeight()
 
-def show(picture, title=None) -> None:
+def show(picture) -> None:
     if not isinstance(picture, Picture):
         print("show(picture): Input is not a picture")
         raise ValueError
