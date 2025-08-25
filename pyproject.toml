@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.2.8"
+version = "0.2.10"
 dependencies = [
   "wxPython > 4.2.0",
   "pillow >11.0.0",
@@ -33,6 +33,9 @@ license-files = ["LICEN[CS]E*"]
 [project.urls]
 Homepage = "https://github.com/dllargent/mediaComp"
 Issues = "https://github.com/dllargent/mediaComp/issues"
+
+[tool.setuptools.package-data]
+"mediaComp" = ["py.typed", "*.pyi"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [
