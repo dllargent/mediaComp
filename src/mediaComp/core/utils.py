@@ -155,7 +155,11 @@ def showWarning(message) -> None:
     # tk.Button(root, text="Okay", command=on_close).pack(pady=5)
 
     # root.mainloop()
-    _showDialog("Warning", message)
+
+
+
+    #_showDialog("Warning", message)
+    messagebox.showwarning("Warning", message)
 
 def showInformation(message) -> None:
     messagebox.showinfo("Information", message)
