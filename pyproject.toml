@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.2.10"
+version = "0.2.12"
 dependencies = [
   "wxPython > 4.2.0",
   "pillow >11.0.0",
@@ -42,5 +42,6 @@ exclude = [
   "*.docx",
   "**/__pycache__",
   "test.py",
-  "dev/"
+  "dev/",
+  "dialog/"
 ]

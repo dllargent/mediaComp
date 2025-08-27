@@ -106,66 +106,17 @@ def requestIntegerInRange(message, min_val, max_val) -> int:
     return _requestInfoDialog("Enter an Integer in Range", message, "requestInt", min_val, max_val)
 
 def requestString(message) -> str:
-    # result = {"value": None}
-
-    # def submit():
-    #     result["value"] = entry.get()
-    #     root.destroy()
-
-    # def on_close():
-    #     result["value"] = None
-    #     root.destroy()
-
-    # root = tk.Tk()
-    # root.title("Enter a String")
-    # root.resizable(False, False)
-    # _center_window(root, 250, 100)
-    # _bring_to_front(root)
-    # root.protocol("WM_DELETE_WINDOW", on_close)
-
-    # tk.Label(root, text=message).pack(pady=10)
-    # entry = tk.Entry(root, width=30)
-    # entry.pack(pady=5)
-    # entry.focus_set()
-
-    # entry.bind("<Return>", lambda event: submit())
-
-    # tk.Button(root, text="Submit", command=submit).pack(pady=5)
-
-    # root.mainloop()
-    # return result["value"]
     return _requestInfoDialog("Enter a String", message, "requestString")
 
 
 def showWarning(message) -> None:
-    #messagebox.showwarning("Warning", message)
-
-    # def on_close():
-    #     root.destroy()
-
-    # root = tk.Tk()
-    # root.title("Warning")
-    # root.resizable(False, False)
-    # _center_window(root, 250, 100)
-    # _bring_to_front(root)
-    # root.protocol("WM_DELETE_WINDOW", on_close)
-
-    # tk.Label(root, text=message).pack(pady=10)
-
-    # tk.Button(root, text="Okay", command=on_close).pack(pady=5)
-
-    # root.mainloop()
-
-
-
-    #_showDialog("Warning", message)
-    messagebox.showwarning("Warning", message)
+    _showDialog("Warning", message)
 
 def showInformation(message) -> None:
-    messagebox.showinfo("Information", message)
+    _showDialog("Information", message)
 
 def showError(message) -> None:
-    messagebox.showerror("Error", message)
+    _showDialog("Error", message)
 
 def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
     if min_val >= max_val:
@@ -218,10 +169,12 @@ def _showDialog(title, message):
     root.title(title)
     root.resizable(False, False)
     _center_window(root, 250, 100)
-    _bring_to_front(root)
     root.protocol("WM_DELETE_WINDOW", on_close)
 
     tk.Label(root, text=message).pack(pady=10)
-    tk.Button(root, text="OK", command=on_close).pack(pady=5)
+    button = tk.Button(root, text="OK", command=on_close)
+    button.pack(pady=5)
+    root.bind("<Return>", lambda event: on_close())
+    _bring_to_front(root)
     root.mainloop()
     return None
