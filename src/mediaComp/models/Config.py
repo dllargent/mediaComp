@@ -74,3 +74,5 @@ class ConfigManager:
 
     def getMEDIACOMPPath(self):
         return self.get("CONFIG_MEDIACOMP_PATH")
+    
+config = ConfigManager()

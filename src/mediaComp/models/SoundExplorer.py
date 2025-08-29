@@ -1,7 +1,9 @@
 from typing import Optional
 from abc import ABC, abstractmethod
+import threading
 import tkinter as tk
 from .Sound import Sound
+from .PixelColor import Color
 
 class MouseMotionListener(ABC):
     @abstractmethod
@@ -35,10 +37,10 @@ class LineListener(ABC):
     def update(self, event):
         pass
 
-class SamplingPanel(tk.Frame):
+class SamplingPanel(tk.Frame,):
     """Class to display the sound wave."""
     
-    def __init__(self, parent, sound_explorer):
+    def __init__(self, parent, sound_explorer: 'SoundExplorer'):
         super().__init__(parent)
         self.sound_explorer = sound_explorer
         self.points = []
@@ -75,7 +77,7 @@ class SamplingPanel(tk.Frame):
     
     def create_wave_form(self):
         """Create the sound wave visualization."""
-        sound = self.sound_explorer.sound
+        sound: Sound = self.sound_explorer.sound
         sample_width = self.sound_explorer.sample_width
         sample_height = self.sound_explorer.sample_height
         frames_per_pixel = self.sound_explorer.frames_per_pixel
@@ -89,10 +91,6 @@ class SamplingPanel(tk.Frame):
             if hasattr(sound, 'get_audio_file_format'):
                 format_info = sound.get_audio_file_format()
                 sample_size_bits = format_info.get_sample_size_in_bits()
-            elif hasattr(sound, 'getSampleSize'):
-                sample_size_bits = sound.getSampleSize()
-            elif hasattr(sound, 'getBitsPerSample'):
-                sample_size_bits = sound.getBitsPerSample()
             else:
                 # Default to 16-bit
                 sample_size_bits = 16
@@ -118,7 +116,7 @@ class SamplingPanel(tk.Frame):
             try:
                 sample_index = int(pixel * frames_per_pixel)
                 if sample_index < sound.getLengthInFrames():
-                    sample_value = sound.getSample(sample_index)
+                    sample_value = sound.getSampleValue(sample_index)
                     # Normalize the sample value to fit in the display
                     y = (sample_height // 2) - (sample_value * (sample_height // 2) / max_value)
                     # Clamp y to valid range
@@ -201,21 +199,22 @@ class SamplingPanel(tk.Frame):
         self.repaint()
 
 class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineListener):
-    # Class constants (equivalent to static final)
-    ZOOM_IN_HINT = "Click to see all the samples (the number of samples between pixels is 1)"
-    CURRENT_INDEX_TEXT = "Current Index: "
-    START_INDEX_TEXT = "Start Index: "
-    STOP_INDEX_TEXT = "Stop Index: "
-    SAMPLE_TEXT = "Sample Value: "
     
-    # Color constants
-    SELECTION_COLOR = "gray"
-    BACKGROUND_COLOR = "black"
-    WAVE_COLOR = "white"
-    BAR_COLOR = "cyan"
     
     def __init__(self, sound:Sound):
         """Initialize the SoundExplorer with a sound."""
+        # Class constants (equivalent to static final)
+        self.ZOOM_IN_HINT = "Click to see all the samples (the number of samples between pixels is 1)"
+        self.CURRENT_INDEX_TEXT = "Current Index: "
+        self.START_INDEX_TEXT = "Start Index: "
+        self.STOP_INDEX_TEXT = "Stop Index: "
+        self.SAMPLE_TEXT = "Sample Value: "
+    
+    # Color constants
+        self.SELECTION_COLOR = "grey"
+        self.BACKGROUND_COLOR = "black"
+        self.WAVE_COLOR = "white"
+        self.BAR_COLOR = "cyan"
         
         # Store the primary parameters
         self.sound = sound
@@ -239,7 +238,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.current_pixel_position: int = 0
         
         # Debug flag
-        self.debug: bool = True  # Enable debug for testing
+        self.debug: bool = False  # Enable debug for testing
         
         # Main parts of the GUI
         self.sound_frame: Optional[tk.Tk] = None
@@ -444,7 +443,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
     
     def handle_zoom_out(self):
         """Handle zoom out - simplified."""
-        self.zoom_button.config(text="Zoom In")
+        self.zoom_button.config(text="Zoom Out")
         
         self.sample_width = self.zoom_out_width
         self.frames_per_pixel = self.sound.getLengthInFrames() / self.sample_width
@@ -526,7 +525,6 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
     def show(self):
         """Show the window and start the event loop. Call this after creating the SoundExplorer."""
         if self.sound_frame:
-            print("Starting tkinter mainloop...")
             try:
                 self.sound_frame.mainloop()
             except KeyboardInterrupt:
@@ -540,7 +538,6 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
                         self.sound_frame.destroy()
                 except:
                     pass
-                print("Window cleanup completed")
     
     def run(self):
         """Alias for show() method."""
@@ -548,7 +545,6 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
     
     def _on_window_close(self):
         """Handle window close event."""
-        print("Window closing...")
         # Try to stop any playing sounds
         try:
             if hasattr(self.sound, 'stop'):

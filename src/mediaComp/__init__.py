@@ -19,7 +19,6 @@ from .core import (
         penDown, drop, getXPos, getYPos, getHeading, makeWorld, getTurtleList, blue, red,
         green, gray, darkGray, lightGray, yellow, orange, pink, magenta, cyan, white, black
     )
-from mediaComp.models.Config import ConfigManager
 
 __all__ = [
     "setColorWrapAround", "getColorWrapAround", "pickAColor", "distance", "makeDarker", "makeLighter", "makeColor",
@@ -37,7 +36,7 @@ __all__ = [
     "getSampleValue", "getSound", "getNumSamples", "getDuration", "writeSoundTo", "randomSamples", "getIndex", 
     "playNote", "turn", "turnRight", "turnToFace", "turnLeft", "forward", "backward", "moveTo", "makeTurtle", "penUp", 
     "penDown", "drop", "getXPos", "getYPos", "getHeading", "makeWorld", "getTurtleList", "blue", "red", 
-    "green", "gray", "darkGray", "lightGray", "yellow", "orange", "pink", "magenta", "cyan", "white", "black"
+    "green", "gray", "darkGray", "lightGray", "yellow", "orange", "pink", "magenta", "cyan", "white", "black", "config"
 ]
 
-config = ConfigManager()
+from mediaComp.models.Config import config

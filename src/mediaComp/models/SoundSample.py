@@ -1,4 +1,4 @@
-from . import Config
+from .Config import config
 
 class SoundSample:
     """Provides access to frames (samples) within a Sound
@@ -23,7 +23,7 @@ class SoundSample:
         frameNumber : int
             index of frame (sample)
         """
-        self.wrapLevels = Config.getConfigVal("CONFIG_WRAPPIXELVALUES")
+        self.wrapLevels = config.get("CONFIG_WRAPPIXELVALUES")
         self.sound = sound
         self.frameNumber = frameNumber
 

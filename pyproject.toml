@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.2.12"
+version = "0.3.0"
 dependencies = [
   "wxPython > 4.2.0",
   "pillow >11.0.0",

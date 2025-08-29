@@ -264,9 +264,9 @@ def soundTool(sound) -> None:
     #     print("openSound(sound): Input is not a sound.")
     #     raise ValueError
     
-    soundGUI(createSoundPlot(sound), sound)
-    #explore = SoundExplorer(sound)
-    #explore.show()
+    #soundGUI(createSoundPlot(sound), sound)
+    explore = SoundExplorer(sound)
+    explore.show()
     
 def createSoundPlot(sound) -> plt.Figure:
     try:
