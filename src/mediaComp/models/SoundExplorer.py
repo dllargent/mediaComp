@@ -65,7 +65,6 @@ class SamplingPanel(tk.Frame,):
             highlightthickness=0
         )
         self.canvas.pack(fill=tk.BOTH, expand=True)
-        
         # Bind mouse events to canvas
         self.canvas.bind('<Motion>', sound_explorer.mouse_moved)
         self.canvas.bind('<Button-1>', sound_explorer.mouse_clicked)
@@ -361,6 +360,15 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
     def mouse_exited(self, event):
         """Handle mouse exited event."""
         pass
+
+    def action_performed(self, event):
+        return super().action_performed(event)
+    
+    def mouse_moved(self, event):
+        return super().mouse_moved(event)
+    
+    def update(self, event):
+        return super().update(event)
         
     def mouse_dragged(self, event):
         """Handle mouse dragged event."""
@@ -368,61 +376,23 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         # Highlight the selection as we drag by simulating mouse release
         self.mouse_released(event)
         
-    def mouse_moved(self, event):
-        """Handle mouse move event."""
-        pass
-        
-    def update(self, event):
-        """Handle line event update."""
-        pass
-    
-    def action_performed(self, event):
-        """Handle action events (button clicks, etc.)."""
-        pass  # This is handled by action_performed_handler
-        
     def action_performed_handler(self, command: str):
         """Handle action events from buttons."""
         try:
             if command == "Play Entire Sound":
                 self.sound.play()
             elif command == "Play Selection":
-                # Try different method names for playing selection
-                if hasattr(self.sound, 'playRange'):
-                    self.sound.playRange(1, self.start_frame, self.stop_frame)
-                elif hasattr(self.sound, 'play'):
-                    # If no range method, just play the whole sound
-                    print(f"Playing selection from {self.start_frame} to {self.stop_frame}")
-                    self.sound.play()
+                self.sound.playRange(self.start_frame, self.stop_frame)
             elif command == "Stop":
-                # Try different methods to stop playback
-                if hasattr(self.sound, 'stop'):
-                    self.sound.stop()
-                elif hasattr(self.sound, 'stopPlaying'):
-                    self.sound.stopPlaying()
-                else:
-                    print("Stop not implemented")
+                self.sound.stopPlaying()
             elif command == "Zoom In":
                 self.handle_zoom_in(True)
             elif command == "Zoom Out":
                 self.handle_zoom_out()
             elif command == "Play Before":
-                # Try different method names
-                if hasattr(self.sound, 'playRange'):
-                    self.sound.playRange(1, 0, int(self.current_pixel_position * self.frames_per_pixel))
-                elif hasattr(self.sound, 'PlayRange'):
-                    self.sound.PlayRange(1, 0, int(self.current_pixel_position * self.frames_per_pixel))
-                else:
-                    print(f"Playing before position {self.current_pixel_position}")
-                    self.sound.play()
+                self.sound.playRange(0, int(self.current_pixel_position * self.frames_per_pixel))
             elif command == "Play After":
-                # Try different method names
-                if hasattr(self.sound, 'playRange'):
-                    self.sound.playRange(1, int(self.current_pixel_position * self.frames_per_pixel), self.sound.getLengthInFrames() - 1)
-                elif hasattr(self.sound, 'PlayRange'):
-                    self.sound.PlayRange(1, int(self.current_pixel_position * self.frames_per_pixel), self.sound.getLengthInFrames() - 1)
-                else:
-                    print(f"Playing after position {self.current_pixel_position}")
-                    self.sound.play()
+                self.sound.playRange(int(self.current_pixel_position * self.frames_per_pixel), self.sound.getLengthInFrames() - 1)
         except Exception as ex:
             self.catch_exception(ex)
     
@@ -456,26 +426,22 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.sample_panel.create_wave_form()
         
         self.update_index_values()
+        self.zoom_button.config(text="Zoom In")
         self.sample_panel.update()
     
     def check_scroll(self):
         """Check that the current position is in the viewing area and scroll if needed."""
-        # Only do this if we are not zoomed out
         if self.sample_width != self.zoom_out_width:
-            # This would implement scrolling logic for tkinter
-            # More complex implementation needed for proper scrolling
-            pass
+            scrollbar = tk.Scrollbar(parent=self.sound_panel, orient=tk.HORIZONTAL)
+            scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
     
     def handle_zoom_in_index(self, index: int):
         """Handle zoom in to view all sample values at specific index."""
         if index % self.frames_per_pixel != 0:
-            # Do normal zoom in on current position
             self.handle_zoom_in(False)
             
-        # Change current position to the passed index
         self.current_pixel_position = int(index / self.frames_per_pixel) - self.base
             
-        # Check scroll and repaint
         self.check_scroll()
         self.sample_panel.update()
     
@@ -489,7 +455,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         # Create main window
         self.sound_frame = tk.Tk()
         self.sound_frame.title(file_name)
-        
+        self.sound_frame.resizable(False, False)
         # Set up window properties
         self.sound_frame.protocol("WM_DELETE_WINDOW", self._on_window_close)
         
@@ -509,7 +475,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.sound_frame.update_idletasks()  # Calculate required size
         
         # Set a reasonable window size
-        window_width = max(self.sample_width + 20, 800)
+        window_width = self.sample_width + 20
         window_height = self.sample_height + 200  # Extra space for controls
         self.sound_frame.geometry(f"{window_width}x{window_height}")
         
@@ -597,8 +563,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.stop_button = self.make_button("Stop", True, self.button_panel)
         
         # Pack panels
-        self.button_panel.pack(side=tk.TOP, fill=tk.X)
-        selection_panel.pack(side=tk.BOTTOM, fill=tk.X)
+        self.button_panel.pack(side=tk.TOP, expand=True, anchor="center")
+        selection_panel.pack(side=tk.BOTTOM, expand=True, anchor="center")
     
     def create_sound_panel(self):
         """Create the panel that displays the sound waveform."""
@@ -642,7 +608,9 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.index_value.insert(0, str(self.base))
         self.index_value.bind('<Return>', self._index_value_changed)
         
-        self.sample_value = tk.Entry(top_panel, width=10, state='readonly')
+        self.sample_value = tk.Entry(top_panel, width=10)
+        self.sample_value.insert(0, self.sound.getSample(0) if self.sound.getLengthInFrames() > 0 else "N/A")
+        self.sample_value.config(state='readonly')
         
         # Create labels - simplified
         self.index_label = tk.Label(top_panel, text=self.CURRENT_INDEX_TEXT)

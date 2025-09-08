@@ -245,6 +245,14 @@ class Sound:
         waveObject = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
         self.playbacks.append(waveObject.play())
 
+    def playRange(self, start, end):
+        bytes_per_frame = self.numChannels * self.sampleWidth
+        start_byte = start * bytes_per_frame  
+        end_byte = end * bytes_per_frame
+    
+        wave = sa.WaveObject(self.buffer[start_byte:end_byte], self.numChannels, self.sampleWidth, self.sampleRate)
+        self.playbacks.append(wave.play())
+
     def playMix(self):
         self.soundMix.play()
 
