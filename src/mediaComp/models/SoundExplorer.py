@@ -1,8 +1,8 @@
 from typing import Optional
 from abc import ABC, abstractmethod
-import threading
 import tkinter as tk
 from .Sound import Sound
+import re
 from .PixelColor import Color
 
 class MouseMotionListener(ABC):
@@ -448,7 +448,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
     def create_window(self):
         """Create and display the main window and all GUI components."""
         # Get filename for window title
-        file_name = self.sound.getFileName()
+        pattern = re.compile(r'([^\\/]+)[\\/][^\\/]+$')
+        file_name = pattern.search(self.sound.getFileName()).group(0)
         if file_name is None:
             file_name = "no file name"
         
@@ -609,7 +610,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.index_value.bind('<Return>', self._index_value_changed)
         
         self.sample_value = tk.Entry(top_panel, width=10)
-        self.sample_value.insert(0, self.sound.getSample(0) if self.sound.getLengthInFrames() > 0 else "N/A")
+        self.sample_value.insert(0, self.sound.getSample(0).getValue() if self.sound.getLengthInFrames() > 0 else "N/A")
         self.sample_value.config(state='readonly')
         
         # Create labels - simplified
@@ -675,10 +676,10 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         
         # Try to update the value at the current sample index
         try:
-            sample = self.sound.getSample(cur_frame - self.base)
+            sample = self.sound.getSample(cur_frame - self.base).getValue()
             self.sample_value.config(state='normal')
             self.sample_value.delete(0, tk.END)
-            self.sample_value.insert(0, f"{sample:.4f}")
+            self.sample_value.insert(0, f"{sample:.0f}")
             self.sample_value.config(state='readonly')
         except Exception as ex:
             self.catch_exception(ex)
