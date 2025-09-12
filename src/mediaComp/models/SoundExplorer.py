@@ -432,7 +432,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
     def check_scroll(self):
         """Check that the current position is in the viewing area and scroll if needed."""
         if self.sample_width != self.zoom_out_width:
-            scrollbar = tk.Scrollbar(parent=self.sound_panel, orient=tk.HORIZONTAL)
+            scrollbar = tk.Scrollbar(parent=self.sample_panel, orient=tk.HORIZONTAL)
             scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
     
     def handle_zoom_in_index(self, index: int):
