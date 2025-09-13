@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.3.3"
+version = "0.3.4"
 dependencies = [
   "wxPython > 4.2.0",
   "pillow >11.0.0",
@@ -13,13 +13,9 @@ dependencies = [
   "matplotlib >= 3.10.0"
 ]
 authors = [
-  { name="Jason Yoder", email="jason.yoder2@bsu.edu" },
-  { name="David Largent", email="dllargent@bsu.edu"}
+  { name="A community project", email="dllargent@bsu.edu" },
 ]
-maintainers = [
-  { name="Jason Yoder", email="jason.yoder2@bsu.edu" },
-  { name="David Largent", email="dllargent@bsu.edu"}
-]
+
 description = "A multimedia processing library for Python 3."
 readme = "README.md"
 requires-python = ">=3.9"

@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 import tkinter as tk
 from .Sound import Sound
 import re
-from .PixelColor import Color
 
 class MouseMotionListener(ABC):
     @abstractmethod
@@ -351,6 +350,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             self.sample_panel.update()
             self.play_selection_button.config(state=tk.NORMAL)
             self.clear_selection_button.config(state=tk.NORMAL)
+            self.play_before_button.config(state=tk.NORMAL)
+            self.play_after_button.config(state=tk.NORMAL)
             self.mouse_dragged_flag = False
     
     def mouse_entered(self, event):
@@ -390,13 +391,13 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             elif command == "Zoom Out":
                 self.handle_zoom_out()
             elif command == "Play Before":
-                self.sound.playRange(0, int(self.current_pixel_position * self.frames_per_pixel))
+                self.sound.playRange(0, self.start_frame)
             elif command == "Play After":
-                self.sound.playRange(int(self.current_pixel_position * self.frames_per_pixel), self.sound.getLengthInFrames() - 1)
+                self.sound.playRange(self.stop_frame, self.sound.getLengthInFrames() - 1)
         except Exception as ex:
             self.catch_exception(ex)
     
-    def handle_zoom_in(self, from_button: bool):
+    def handle_zoom_in(self):
         """Handle zoom in functionality."""
         if self.frames_per_pixel > 1:
             self.frames_per_pixel = max(1, self.frames_per_pixel // 2)
@@ -560,7 +561,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.play_entire_button = self.make_button("Play Entire Sound", True, self.button_panel)
         self.selection_prev_state = False
         self.play_before_button = self.make_button("Play Before", False, self.button_panel)
-        self.play_after_button = self.make_button("Play After", True, self.button_panel)
+        self.play_after_button = self.make_button("Play After", False, self.button_panel)
         self.stop_button = self.make_button("Stop", True, self.button_panel)
         
         # Pack panels
@@ -660,6 +661,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.sample_panel.update()
         self.play_selection_button.config(state=tk.DISABLED)
         self.clear_selection_button.config(state=tk.DISABLED)
+        self.play_before_button.config(state=tk.DISABLED)
+        self.play_after_button.config(state=tk.DISABLED)
     
     def update_index_values(self):
         """Method to update the index values to the current index position."""
