@@ -1,5 +1,10 @@
-# mediaComp 
-MediaComp is a free and open-source conversion of the multimedia library JES4PY by Mark Guzdial to Python 3. It utilizes multiple popular libraries to provide an abstraction of manipulating sounds, images, and colors. 
+# mediaComp: a multimedia library for Python 3 
+MediaComp is a free and open-source multimedia library for Python 3 which enables the easy manipulation of images and sounds. It utilizes popular libraries to provide an abstraction of manipulating sounds, images, and colors, by abstracting the complexity into easy-to-use function calls.
+
+## History
+MediaComp is a conversion of the multimedia library originally developed and released by Mark Guzdial & Barbara Ericson for use with their _Introduction to Computing and Programming in Python: A multimedia Approach_ book (last edition ISBN 978-0-13-402554-4). It is based on Python 3, whereas the Guzdial/Ericson (G/E) version was based on Jython 2.7. Our implementation is based on Gordon College'd [JES4PY](https://github.com/gordon-cs/JES4py "Gordon College's JESPY GitHub repository") conversion, which implemented a subset of the original G/E multimedia library features so they could be used in Python 3. Their goal was, and ours is, to provide the pedagogical assets of the G/E multimedia library without requiring Jython or needing to use the JES IDE. While mediaComp is still a subset of the G/E implementation, it provides added functionality when compared to JESPY.
+
+MediaComp is a conversion of only the media computation multimedia library, and does not include [JES](https://github.com/gatech-csl/jes), the Jython Environment for Students, which is an educational IDE used in the Media Computation curriculum developed by Guzdial and Ericson. More details on the curriculum are available at http://www.mediacomputation.org/.
 
 ## Installation
 Before installing mediaComp, verify that Python is installed on your device. To find out, open a command prompt or terminal and type:
@@ -14,11 +19,11 @@ To install our package run:
 
 ## Help
 
-If you are new to mediaComp you should be able to start faily easily. Our abstraction make the functionality of the library intuitive. Full documentation can be found on our [GitHub](https://github.com/dllargent/mediaComp).
+Even if you are new to mediaComp you should be able to start faily easily. Our abstractions make the functionality of the library intuitive. Full documentation can be found on our [GitHub](https://github.com/dllargent/mediaComp).
 
 ## Credits
-Thank you so everyone who has contributed to this library.
-- Dave Largent
+Thank you to everyone who has contributed to this library.
+- Dave Largent (mentor)
 - Jason Yoder
 - CJ Fulciniti
 - Santos Pena
