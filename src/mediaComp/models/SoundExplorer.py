@@ -1,6 +1,7 @@
 from typing import Optional
 from abc import ABC, abstractmethod
 import tkinter as tk
+from tkinter import ttk
 from .Sound import Sound
 import re
 
@@ -259,6 +260,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         # Parts of the sound panel
         self.sound_wrapper: Optional[tk.Frame] = None
         self.sample_panel = None  # SamplingPanel equivalent
+        self.scrollbar_h: Optional[ttk.Scrollbar] = None
         
         # Parts of the information panel
         self.info_panel: Optional[tk.Frame] = None
@@ -346,6 +348,9 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             # For highlighting the selection
             self.selection_start = self.mouse_pressed_pos
             self.selection_stop = self.mouse_released_pos
+            
+            # Update current index to start frame (like JES)
+            self.current_pixel_position = self.mouse_pressed_pos
                 
             self.sample_panel.update()
             self.play_selection_button.config(state=tk.NORMAL)
@@ -353,6 +358,9 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             self.play_before_button.config(state=tk.NORMAL)
             self.play_after_button.config(state=tk.NORMAL)
             self.mouse_dragged_flag = False
+            
+            # Update the index values to show the start frame
+            self.update_index_values()
     
     def mouse_entered(self, event):
         """Handle mouse entered event."""
@@ -383,17 +391,32 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             if command == "Play Entire Sound":
                 self.sound.play()
             elif command == "Play Selection":
-                self.sound.playRange(self.start_frame, self.stop_frame)
+                if self.start_frame != self.stop_frame:
+                    self.sound.playRange(self.start_frame, self.stop_frame)
+                else:
+                    # No selection, play from current position
+                    current_frame = int(self.current_pixel_position * self.frames_per_pixel) + self.base
+                    self.sound.playRange(current_frame, self.sound.getLengthInFrames() - 1)
             elif command == "Stop":
                 self.sound.stopPlaying()
             elif command == "Zoom In":
-                self.handle_zoom_in(True)
+                self.handle_zoom_in()
             elif command == "Zoom Out":
                 self.handle_zoom_out()
             elif command == "Play Before":
-                self.sound.playRange(0, self.start_frame)
+                if self.selection_start != -1:
+                    self.sound.playRange(0, self.start_frame)
+                else:
+                    # Play before current position
+                    current_frame = int(self.current_pixel_position * self.frames_per_pixel) + self.base
+                    self.sound.playRange(0, current_frame)
             elif command == "Play After":
-                self.sound.playRange(self.stop_frame, self.sound.getLengthInFrames() - 1)
+                if self.selection_stop != -1:
+                    self.sound.playRange(self.stop_frame, self.sound.getLengthInFrames() - 1)
+                else:
+                    # Play after current position
+                    current_frame = int(self.current_pixel_position * self.frames_per_pixel) + self.base
+                    self.sound.playRange(current_frame, self.sound.getLengthInFrames() - 1)
         except Exception as ex:
             self.catch_exception(ex)
     
@@ -408,6 +431,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             self.sample_panel.create_wave_form()
             self.update_index_values()
             self.sample_panel.update()
+            self.check_scroll()
             
             if self.frames_per_pixel == 1:
                 self.zoom_button.config(text="Zoom Out")
@@ -429,19 +453,34 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.update_index_values()
         self.zoom_button.config(text="Zoom In")
         self.sample_panel.update()
+        self.check_scroll()
     
     def check_scroll(self):
         """Check that the current position is in the viewing area and scroll if needed."""
-        if self.sample_width != self.zoom_out_width:
-            scrollbar = tk.Scrollbar(parent=self.sample_panel, orient=tk.HORIZONTAL)
-            scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        if self.sample_width > self.zoom_out_width:
+            # Need horizontal scrollbar
+            if self.scrollbar_h is None:
+                self.scrollbar_h = ttk.Scrollbar(self.sound_wrapper, orient=tk.HORIZONTAL)
+                self.scrollbar_h.pack(side=tk.BOTTOM, fill=tk.X)
+                
+                # Configure scrollbar to work with canvas
+                self.sample_panel.canvas.config(scrollregion=(0, 0, self.sample_width, self.sample_height))
+                self.sample_panel.canvas.config(xscrollcommand=self.scrollbar_h.set)
+                self.scrollbar_h.config(command=self.sample_panel.canvas.xview)
+        else:
+            # Remove scrollbar if not needed
+            if self.scrollbar_h is not None:
+                self.scrollbar_h.destroy()
+                self.scrollbar_h = None
+                self.sample_panel.canvas.config(scrollregion="")
+                self.sample_panel.canvas.config(xscrollcommand=None)
     
     def handle_zoom_in_index(self, index: int):
         """Handle zoom in to view all sample values at specific index."""
-        if index % self.frames_per_pixel != 0:
-            self.handle_zoom_in(False)
+        if self.frames_per_pixel > 1 and index % self.frames_per_pixel != 0:
+            self.handle_zoom_in()
             
-        self.current_pixel_position = int(index / self.frames_per_pixel) - self.base
+        self.current_pixel_position = max(0, int((index - self.base) / self.frames_per_pixel))
             
         self.check_scroll()
         self.sample_panel.update()
@@ -450,8 +489,10 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         """Create and display the main window and all GUI components."""
         # Get filename for window title
         pattern = re.compile(r'([^\\/]+)[\\/][^\\/]+$')
-        file_name = pattern.search(self.sound.getFileName()).group(0)
-        if file_name is None:
+        match = pattern.search(self.sound.getFileName())
+        if match:
+            file_name = match.group(0)
+        else:
             file_name = "no file name"
         
         # Create main window
@@ -656,6 +697,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         """Method to clear the selection information."""
         self.selection_start = -1
         self.selection_stop = -1
+        self.start_frame = 0
+        self.stop_frame = 0
         self.start_index_label.config(text=self.START_INDEX_TEXT + "N/A")
         self.stop_index_label.config(text=self.STOP_INDEX_TEXT + "N/A")
         self.sample_panel.update()
@@ -669,8 +712,10 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         cur_frame = int(self.current_pixel_position * self.frames_per_pixel) + self.base
         
         # Update the display of the current sample (frame) index
+        self.index_value.config(state='normal')
         self.index_value.delete(0, tk.END)
         self.index_value.insert(0, str(cur_frame))
+        self.index_value.config(state='readonly')
         
         # Update the number of samples per (between) pixels field
         if self.num_samples_per_pixel_field is not None:
@@ -797,8 +842,17 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         """Handle index value text field change."""
         try:
             index = int(self.index_value.get())
-            self.handle_zoom_in_index(index)
-            self.update_index_values()
+            # Calculate the pixel position for this index
+            pixel_pos = int((index - self.base) / self.frames_per_pixel)
+            self.current_pixel_position = max(0, min(pixel_pos, self.sample_width - 1))
+            
+            # If the frames per pixel is greater than 1 and we need precision, zoom in
+            if self.frames_per_pixel > 1:
+                self.handle_zoom_in_index(index)
+            else:
+                self.update_index_values()
+                self.check_scroll()
+                self.sample_panel.update()
         except ValueError:
             pass  # Invalid input, ignore
     
@@ -808,6 +862,5 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             frames = int(self.num_samples_per_pixel_field.get())
             if frames > 0:
                 self.handle_frames_per_pixel(frames)
-                self.update_index_values()
         except ValueError:
             pass  # Invalid input, ignore
