@@ -611,5 +611,4 @@ class Sound:
         file.close()
 
     def setSoundExplorer(self, soundExplorer):
-        from .SoundExplorer import SoundExplorer
         self.soundExplorer = soundExplorer
