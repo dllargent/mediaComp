@@ -189,7 +189,19 @@ class SamplingPanel(tk.Frame,):
                 fill="red", 
                 font=("Arial", 12)
             )
-            
+        # Draw the current index bar (on top of waveform)
+        try:
+            x = int(self.sound_explorer.current_pixel_position)
+            if 0 <= x < self.sound_explorer.sample_width:
+                self.canvas.create_line(
+                    x, 0, x, self.sound_explorer.sample_height,
+                    fill=self.sound_explorer.BAR_COLOR,
+                    width=1
+                )
+        except Exception:
+            # If anything goes wrong drawing the bar, ignore and continue
+            pass
+
         # Force canvas update
         self.canvas.update_idletasks()
     
@@ -298,7 +310,17 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
     # Interface method implementations
     def mouse_clicked(self, event):
         """Handle mouse click event."""
-        self.current_pixel_position = event.x
+        # Translate to canvas coordinates in case canvas is scrolled
+        try:
+            canvas_x = int(self.sample_panel.canvas.canvasx(event.x))
+        except Exception:
+            canvas_x = event.x
+        self.current_pixel_position = canvas_x
+        # Clear any existing selection when the user single-clicks to place the bar
+        self.selection_start = -1
+        self.selection_stop = -1
+        self.start_index_label.config(text=self.START_INDEX_TEXT + "N/A")
+        self.stop_index_label.config(text=self.STOP_INDEX_TEXT + "N/A")
            
         if self.current_pixel_position == 0:
             self.play_before_button.config(state=tk.DISABLED)
@@ -315,14 +337,31 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             
         self.update_index_values()
         self.sample_panel.update()
+        # Update play before/after based on new current position
+        cur_frame = int(self.current_pixel_position * self.frames_per_pixel) + self.base
+        if cur_frame <= 0:
+            self.play_before_button.config(state=tk.DISABLED)
+        else:
+            self.play_before_button.config(state=tk.NORMAL)
+
+        if cur_frame >= self.sound.getLengthInFrames() - 1:
+            self.play_after_button.config(state=tk.DISABLED)
+        else:
+            self.play_after_button.config(state=tk.NORMAL)
     
     def mouse_pressed(self, event):
         """Handle mouse press event."""
-        self.mouse_pressed_x = event.x
+        try:
+            self.mouse_pressed_x = int(self.sample_panel.canvas.canvasx(event.x))
+        except Exception:
+            self.mouse_pressed_x = event.x
         
     def mouse_released(self, event):
         """Handle mouse release event."""
-        self.mouse_released_x = event.x
+        try:
+            self.mouse_released_x = int(self.sample_panel.canvas.canvasx(event.x))
+        except Exception:
+            self.mouse_released_x = event.x
         
         if self.mouse_dragged_flag:
             self.mouse_pressed_pos = self.mouse_pressed_x
@@ -361,6 +400,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             
             # Update the index values to show the start frame
             self.update_index_values()
+
+    
     
     def mouse_entered(self, event):
         """Handle mouse entered event."""
@@ -712,10 +753,21 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         cur_frame = int(self.current_pixel_position * self.frames_per_pixel) + self.base
         
         # Update the display of the current sample (frame) index
+        # Keep the index_value editable so users can type in a number.
+        # We update its contents but leave it in normal state.
+        try:
+            sel = self.index_value.selection_get()
+        except Exception:
+            sel = None
         self.index_value.config(state='normal')
         self.index_value.delete(0, tk.END)
         self.index_value.insert(0, str(cur_frame))
-        self.index_value.config(state='readonly')
+        # Restore selection if user had selected text
+        try:
+            if sel is not None:
+                self.index_value.selection_range(0, tk.END)
+        except Exception:
+            pass
         
         # Update the number of samples per (between) pixels field
         if self.num_samples_per_pixel_field is not None:
@@ -845,14 +897,30 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             # Calculate the pixel position for this index
             pixel_pos = int((index - self.base) / self.frames_per_pixel)
             self.current_pixel_position = max(0, min(pixel_pos, self.sample_width - 1))
-            
-            # If the frames per pixel is greater than 1 and we need precision, zoom in
-            if self.frames_per_pixel > 1:
-                self.handle_zoom_in_index(index)
+            # Clear any selection when the index is set manually
+            self.selection_start = -1
+            self.selection_stop = -1
+            self.start_index_label.config(text=self.START_INDEX_TEXT + "N/A")
+            self.stop_index_label.config(text=self.STOP_INDEX_TEXT + "N/A")
+
+            # Do not auto-zoom when the user types an index. Just move the bar.
+            # If you want an explicit zoom-to-index action, call handle_zoom_in_index
+            # from a dedicated UI control.
+            self.update_index_values()
+            self.check_scroll()
+            self.sample_panel.update()
+
+            # Update play before/after based on new index
+            cur_frame = index
+            if cur_frame <= 0:
+                self.play_before_button.config(state=tk.DISABLED)
             else:
-                self.update_index_values()
-                self.check_scroll()
-                self.sample_panel.update()
+                self.play_before_button.config(state=tk.NORMAL)
+
+            if cur_frame >= self.sound.getLengthInFrames() - 1:
+                self.play_after_button.config(state=tk.DISABLED)
+            else:
+                self.play_after_button.config(state=tk.NORMAL)
         except ValueError:
             pass  # Invalid input, ignore
     
