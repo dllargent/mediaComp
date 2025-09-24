@@ -169,13 +169,13 @@ def addArcFilled(picture, x, y, w, h, start, angle, acolor=black) -> None:
 
 def getPixelAt(picture, x, y) -> Pixel:
     if not isinstance(picture, Picture):
-        print("getPixel(picture,x,y): First input is not a picture")
+        print("getPixelAt(picture,x,y): First input is not a picture")
         raise ValueError
     if (x < Picture._PictureIndexOffset) or (x > getWidth(picture) - 1 + Picture._PictureIndexOffset):
-        print("getPixel(picture,x,y): x (= {}) is less than {} or bigger than the width (= {})".format(x, Picture._PictureIndexOffset, getWidth(picture) - 1 + Picture._PictureIndexOffset))
+        print("getPixelAt(picture,x,y): x (= {}) is less than {} or bigger than the width (= {})".format(x, Picture._PictureIndexOffset, getWidth(picture) - 1 + Picture._PictureIndexOffset))
         raise ValueError
     if (y < Picture._PictureIndexOffset) or (y > getHeight(picture) - 1 + Picture._PictureIndexOffset):
-        print("getPixel(picture,x,y): y (= {}) is less than {} or bigger than the height (= {})".format(y, Picture._PictureIndexOffset, getHeight(picture) - 1 + Picture._PictureIndexOffset))
+        print("getPixelAt(picture,x,y): y (= {}) is less than {} or bigger than the height (= {})".format(y, Picture._PictureIndexOffset, getHeight(picture) - 1 + Picture._PictureIndexOffset))
         raise ValueError
 
     return picture.getPixel(x - Picture._PictureIndexOffset, y - Picture._PictureIndexOffset)
