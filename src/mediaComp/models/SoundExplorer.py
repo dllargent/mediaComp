@@ -512,10 +512,10 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         
         if self.debug:
             print(f"Zoom Out: currentPixelPosition = {self.current_pixel_position}")
-        
         # Update panel sizes and recreate waveform
         self._update_panel_sizes()
         self.sample_panel.create_wave_form()
+        
         
         self.update_index_values()
         self.zoom_button.config(text="Zoom In")
@@ -524,23 +524,25 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
     
     def check_scroll(self):
         """Check that the current position is in the viewing area and scroll if needed."""
-        if self.sample_width > self.zoom_out_width:
-            # Need horizontal scrollbar
+        needs_scrollbar = self.sample_width > self.zoom_out_width
+    
+        if needs_scrollbar:
+            # Need scrollbar - create it if it doesn't exist
             if self.scrollbar_h is None:
                 self.scrollbar_h = ttk.Scrollbar(self.sound_wrapper, orient=tk.HORIZONTAL)
-                self.scrollbar_h.pack(side=tk.BOTTOM, fill=tk.X)
+            self.scrollbar_h.pack(side=tk.BOTTOM, fill=tk.X)
                 
-                # Configure scrollbar to work with canvas
-                self.sample_panel.canvas.config(scrollregion=(0, 0, self.sample_width, self.sample_height))
-                self.sample_panel.canvas.config(xscrollcommand=self.scrollbar_h.set)
-                self.scrollbar_h.config(command=self.sample_panel.canvas.xview)
+            # Connect canvas to scrollbar
+            self.sample_panel.canvas.config(scrollregion=(0, 0, self.sample_width, self.sample_height))
+            self.sample_panel.canvas.config(xscrollcommand=self.scrollbar_h.set)
+            self.scrollbar_h.config(command=self.sample_panel.canvas.xview)
+            
         else:
-            # Remove scrollbar if not needed
+            # Don't need scrollbar - just hide it, don't destroy it
             if self.scrollbar_h is not None:
-                self.scrollbar_h.destroy()
-                self.scrollbar_h = None
-                self.sample_panel.canvas.config(scrollregion="")
+                self.scrollbar_h.pack_forget()  # Hide instead of destroy
                 self.sample_panel.canvas.config(xscrollcommand=None)
+                self.sample_panel.canvas.config(scrollregion="")
     
     def handle_zoom_in_index(self, index: int):
         """Handle zoom in to view all sample values at specific index."""
