@@ -37,7 +37,7 @@ MediaComp is strongly dependent on several libraries. Most of the these will ins
 | pillow | > 11.0.0 |
 | pygame | > 2.5.0 |
 | matplotlib | >= 3.10.0 |
-| numpy | >= 2.3.1 |
+| numpy | >= 2.2.1 |
 | sounddevice | >= 0.5.2 |
 
 ## License
