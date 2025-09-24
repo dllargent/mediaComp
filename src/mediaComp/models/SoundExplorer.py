@@ -155,6 +155,14 @@ class SamplingPanel(tk.Frame,):
                 fill=self.sound_explorer.SELECTION_COLOR,
                 outline=""
             )
+
+        if (self.sound_explorer.selection_start != -1 and self.sound_explorer.selection_stop == -1):
+            self.canvas.create_rectangle(
+                self.sound_explorer.selection_start, 0,
+                self.sound_explorer.selection_start+2, self.sound_explorer.sample_height,
+                fill=self.sound_explorer.BAR_COLOR,
+                outline=""
+            )
         
         # Draw center line first (baseline)
         center_y = self.sound_explorer.sample_height // 2
@@ -364,44 +372,62 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             self.mouse_released_x = event.x
         
         if self.mouse_dragged_flag:
-            self.mouse_pressed_pos = self.mouse_pressed_x
-            self.mouse_released_pos = self.mouse_released_x
-                
-            if self.mouse_pressed_pos > self.mouse_released_pos:  # Selected right to left
-                self.mouse_pressed_pos, self.mouse_released_pos = self.mouse_released_pos, self.mouse_pressed_pos
-                
-            self.start_frame = int(self.mouse_pressed_pos * self.frames_per_pixel)
-            self.stop_frame = int(self.mouse_released_pos * self.frames_per_pixel)
-                
-            # Handle dragging outside the window
-            if self.stop_frame >= self.sound.getLengthInFrames():
-                self.stop_frame = self.sound.getLengthInFrames()
-                
-            if self.start_frame < 0:
-                self.start_frame = 0
-                
-            # Update labels
-            self.start_index_label.config(text=self.START_INDEX_TEXT + str(self.start_frame))
-            self.stop_index_label.config(text=self.STOP_INDEX_TEXT + str(self.stop_frame))
-            
-            # For highlighting the selection
-            self.selection_start = self.mouse_pressed_pos
-            self.selection_stop = self.mouse_released_pos
-            
-            # Update current index to start frame (like JES)
-            self.current_pixel_position = self.mouse_pressed_pos
-                
-            self.sample_panel.update()
-            self.play_selection_button.config(state=tk.NORMAL)
-            self.clear_selection_button.config(state=tk.NORMAL)
-            self.play_before_button.config(state=tk.NORMAL)
-            self.play_after_button.config(state=tk.NORMAL)
-            self.mouse_dragged_flag = False
-            
-            # Update the index values to show the start frame
-            self.update_index_values()
+            self.makeSelection()
+        else:
+            self.makeBar()
 
-    
+    def makeSelection(self):
+        self.mouse_pressed_pos = self.mouse_pressed_x
+        self.mouse_released_pos = self.mouse_released_x
+            
+        if self.mouse_pressed_pos > self.mouse_released_pos:  # Selected right to left
+            self.mouse_pressed_pos, self.mouse_released_pos = self.mouse_released_pos, self.mouse_pressed_pos
+                
+        self.start_frame = int(self.mouse_pressed_pos * self.frames_per_pixel)
+        self.stop_frame = int(self.mouse_released_pos * self.frames_per_pixel)
+                
+        # Handle dragging outside the window
+        if self.stop_frame >= self.sound.getLengthInFrames():
+            self.stop_frame = self.sound.getLengthInFrames()
+                
+        if self.start_frame < 0:
+            self.start_frame = 0
+                
+        # Update labels
+        self.start_index_label.config(text=self.START_INDEX_TEXT + str(self.start_frame))
+        self.stop_index_label.config(text=self.STOP_INDEX_TEXT + str(self.stop_frame))
+            
+        # For highlighting the selection
+        self.selection_start = self.mouse_pressed_pos
+        self.selection_stop = self.mouse_released_pos
+            
+        # Update current index to start frame (like JES)
+        self.current_pixel_position = self.mouse_pressed_pos
+                
+        self.sample_panel.update()
+        self.play_selection_button.config(state=tk.NORMAL)
+        self.clear_selection_button.config(state=tk.NORMAL)
+        self.play_before_button.config(state=tk.NORMAL)
+        self.play_after_button.config(state=tk.NORMAL)
+        self.mouse_dragged_flag = False
+            
+        # Update the index values to show the start frame
+        self.update_index_values()
+
+    def makeBar(self):
+        self.mouse_pressed_pos = self.mouse_pressed_x
+
+        self.start_frame = int(self.mouse_pressed_pos * self.frames_per_pixel)
+        self.start_index_label.config(text=self.START_INDEX_TEXT + str(self.start_frame))
+
+        self.selection_start = self.mouse_pressed_pos
+        self.current_pixel_position = self.mouse_pressed_pos
+        self.sample_panel.update()
+        self.play_before_button.config(state=tk.NORMAL)
+        self.play_after_button.config(state=tk.NORMAL)
+            
+        # Update the index values to show the start frame
+        self.update_index_values()
     
     def mouse_entered(self, event):
         """Handle mouse entered event."""
