@@ -1,9 +1,12 @@
 from .SoundSample import SoundSample
 import wave
 import os
-import simpleaudio as sa
+#import simpleaudio as sa
 import pygame
 import threading
+
+import sounddevice as sd
+import numpy as np
 
 class Sound:
     MAX_NEG = -32768
@@ -100,8 +103,6 @@ class Sound:
                     print("Could not create any pygame Sound object")
                     self.soundMix = None
         
-        self.playbacks = []
-
     def __str__(self):
         """Return string representation of this sound
 
@@ -206,100 +207,7 @@ class Sound:
         for i in range(frameSize):
             theFrame[i] = self.buffer[frameNum * frameSize + i]
         return theFrame
-
-    # ----------------------- modifiers --------------------------------------
-
-    def setBuffer(self, newBuffer):
-        """Changes the buffer assoiciated with the current sound to the (newBuffer)
-
-        Parameters
-        ----------
-        newBuffer : int
-            the length of the buffer that will replace (self.buffer)
-        newBuffer : bytearray
-            the byte array that (self.buffer) is being replaced with
-        """
-        if isinstance(newBuffer, int):
-            self.buffer = bytearray(newBuffer)
-        elif isinstance(newBuffer, bytearray):
-            self.buffer = newBuffer.copy() 
-
-    # ------------------------ methods ---------------------------------------
-
-    def makeAIS(self):
-        print('This function is not implemented in MediaComp.')
-
-    def isStereo(self):
-        """Method to check if a sound is stereo (2 channel) or not
-
-        Returns
-        -------
-        bool
-            True if stereo else False
-        """
-        return self.numChannels != 1
-
-    def play(self):
-        """Play a sound - nonblocking
-        """
-        waveObject = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
-        self.playbacks.append(waveObject.play())
-
-    def playRange(self, start, end):
-        bytes_per_frame = self.numChannels * self.sampleWidth
-        start_byte = start * bytes_per_frame  
-        end_byte = end * bytes_per_frame
     
-        wave = sa.WaveObject(self.buffer[start_byte:end_byte], self.numChannels, self.sampleWidth, self.sampleRate)
-        self.playbacks.append(wave.play())
-
-    def playMix(self):
-        self.soundMix.play()
-
-    def blockingPlayMix(self):
-        with self.lock:
-            if self.is_playing:
-                return
-        self.is_playing = True
-        self.soundMix.play()
-        pygame.time.wait(int(self.soundMix.get_length() * 1000))
-        self.is_playing = False
-
-    def playNote(self, key, duration, intensity):
-        print("This method is not implemented in mediaComp.")
-
-    def convert(self, mp3File, wavFile):
-        print("this method isn't implemented.")
-    
-    def blockingPlay(self):
-        try:
-            wave = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
-            playback = wave.play()
-            playback.wait_done()
-            del wave
-            del playback
-        except Exception as e:
-            print("Playback error:", e)
-
-    def stopPlaying(self):
-        """Stop playback of all currently playing sounds
-        """
-        while len(self.playbacks) > 0:
-            self.playbacks.pop().stop()
-
-    def removePlayback(self, playbackToRemove):
-        """Method to remove a playback from the list of playbacks
-        
-        Parameters
-        ----------
-        playbackToRemove : PlayObject
-            the playback that we want to remove
-
-        """
-        if (self.playbacks.contains(playbackToRemove)):
-            self.playbacks.remove(playbackToRemove)
-            playbackToRemove = None
-
     def getLengthInFrames(self):
         """Obtains number of sample frames in the audio data
 
@@ -347,17 +255,7 @@ class Sound:
         for i in range(self.numFrames):
             samples.append(SoundSample(self, i))
         return samples
-
-    def reportIndexException(self, index):
-        """Method to report an index exception for this sound
-
-        Parameters
-        ----------
-        index : int
-            the index
-        """
-        print("The index {} isn't valid for this sound".format(index))
-
+    
     def getSampleValueAt(self, index):
         """Get the sample at the passed index and handle any SoundExceptions
 
@@ -457,6 +355,33 @@ class Sound:
             the length of the sound as the number of samples
         """
         return self.getNumSamples()
+
+    def isStereo(self):
+        """Method to check if a sound is stereo (2 channel) or not
+
+        Returns
+        -------
+        bool
+            True if stereo else False
+        """
+        return self.numChannels != 1
+
+    # ----------------------- modifiers --------------------------------------
+
+    def setBuffer(self, newBuffer):
+        """Changes the buffer assoiciated with the current sound to the (newBuffer)
+
+        Parameters
+        ----------
+        newBuffer : int
+            the length of the buffer that will replace (self.buffer)
+        newBuffer : bytearray
+            the byte array that (self.buffer) is being replaced with
+        """
+        if isinstance(newBuffer, int):
+            self.buffer = bytearray(newBuffer)
+        elif isinstance(newBuffer, bytearray):
+            self.buffer = newBuffer.copy() 
 
     def setFrame(self, frameNum, frame):
         """Changes the value of each byte of the specified frame
@@ -558,6 +483,81 @@ class Sound:
             filename to assign to this sound
         """
         self.filename = filename
+
+    # ------------------------ methods ---------------------------------------
+
+    def play(self):
+        """Play a sound - nonblocking
+        """
+        #waveObject = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
+        #self.playbacks.append(waveObject.play())
+        sd.play(np.frombuffer(self.buffer, dtype=np.int16), samplerate=self.sampleRate)
+        sd.wait()
+
+    def playRange(self, start, end):
+        # bytes_per_frame = self.numChannels * self.sampleWidth
+        # start_byte = start * bytes_per_frame  
+        # end_byte = end * bytes_per_frame
+    
+        # wave = sa.WaveObject(self.buffer[start_byte:end_byte], self.numChannels, self.sampleWidth, self.sampleRate)
+        # self.playbacks.append(wave.play())
+        dtype = np.int16 if self.sampleWidth == 2 else np.uint8  # common cases
+        audio_array = np.frombuffer(self.buffer, dtype=dtype)
+
+        # Reshape if stereo/multichannel
+        if self.numChannels > 1:
+            audio_array = audio_array.reshape(-1, self.numChannels)
+
+        # Slice frames
+        segment = audio_array[start:end]
+        sd.play(segment, samplerate=self.sampleRate)
+
+    def blockingPlay(self):
+        # try:
+        #     wave = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
+        #     playback = wave.play()
+        #     playback.wait_done()
+        #     del wave
+        #     del playback
+        # except Exception as e:
+        #     print("Playback error:", e)
+        sd.play(np.frombuffer(self.buffer, dtype=np.int16), samplerate=self.sampleRate)
+        sd.wait()
+
+    def playAtRateDur(self, rate, duration):
+        
+        dtype = np.int16 if self.sampleWidth == 2 else np.uint8  # common cases
+        audio_array = np.frombuffer(self.buffer, dtype=dtype)
+
+        # Reshape if stereo/multichannel
+        if self.numChannels > 1:
+            audio_array = audio_array.reshape(-1, self.numChannels)
+
+        # Slice frames
+        segment = audio_array[0:duration]
+        sd.play(segment, samplerate=rate)
+        sd.wait()
+
+    def stopPlaying(self):
+        """Stop playback of all currently playing sounds
+        """
+        #while len(self.playbacks) > 0:
+        #    self.playbacks.pop().stop()
+        sd.stop()
+
+    def convert(self, mp3File, wavFile):
+        print("this method isn't implemented.")
+    
+    def reportIndexException(self, index):
+        """Method to report an index exception for this sound
+
+        Parameters
+        ----------
+        index : int
+            the index
+        """
+        print("The index {} isn't valid for this sound".format(index))
+
 
     # ------------------------ File I/O ---------------------------------------
 

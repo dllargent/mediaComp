@@ -33,11 +33,12 @@ MediaComp is strongly dependent on several libraries. Most of the these will ins
 
 | Dependency | Version |
 | :-----:| :-----: |
-| wxPython | > 4/2/0 |
-| pillow | > 11/0/0 |
-| pygame | > 2/5/0 |
-| simpleaudio | >= 1.0.3 |
+| wxPython | > 4.2.0 |
+| pillow | > 11.0.0 |
+| pygame | > 2.5.0 |
 | matplotlib | >= 3.10.0 |
+| numpy | >= 2.3.1 |
+| sounddevice | >= 0.5.2 |
 
 ## License
 This package is distributed under GPL 3.0-or-later, which can be found in our GitHub repository in ```LICENSE```. This means you can basically use mediaComp in any project you want. Any changes or additions made the package must also be released with a compatible license.
