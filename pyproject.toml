@@ -4,13 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.3.7"
+version = "0.4.0"
 dependencies = [
   "wxPython > 4.2.0",
   "pillow >11.0.0",
   "pygame > 2.5.0",
-  "simpleaudio >= 1.0.3",
-  "matplotlib >= 3.10.0"
+  "matplotlib >= 3.10.0",
+  "numpy >= 2.3.1",
+  "sounddevice >= 0.5.2",
 ]
 authors = [
   { name="A community project", email="dllargent@bsu.edu" },

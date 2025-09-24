@@ -93,12 +93,18 @@ def playAtRate(sound, rate) -> None:
     if not isinstance(sound, Sound):
         print("playAtRate(sound,rate): First input is not a sound")
         raise ValueError
+    if(rate < 1000 or rate > 150000):
+        print("The rate {} is not valid. It must be between 1000 and 150000".format(rate))
+        raise ValueError
     sound.playAtRateDur(rate, sound.getLength())
 
 
 def playAtRateDur(sound, rate, dur) -> None:
     if not isinstance(sound, Sound):
         print("playAtRateDur(sound,rate,dur): First input is not a sound")
+        raise ValueError
+    if(rate < 1000 or rate > 150000):
+        print("The rate {} is not valid. It must be between 1000 and 150000".format(rate))
         raise ValueError
     sound.playAtRateDur(rate, dur)
 
