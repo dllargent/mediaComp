@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import ttk
 from .Sound import Sound
 import re
+import sounddevice as sd
+import numpy as np
 
 class MouseMotionListener(ABC):
     @abstractmethod
@@ -382,7 +384,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             
         if self.mouse_pressed_pos > self.mouse_released_pos:  # Selected right to left
             self.mouse_pressed_pos, self.mouse_released_pos = self.mouse_released_pos, self.mouse_pressed_pos
-                
+        
         self.start_frame = int(self.mouse_pressed_pos * self.frames_per_pixel)
         self.stop_frame = int(self.mouse_released_pos * self.frames_per_pixel)
                 
@@ -398,21 +400,23 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.stop_index_label.config(text=self.STOP_INDEX_TEXT + str(self.stop_frame))
             
         # For highlighting the selection
-        self.selection_start = self.mouse_pressed_pos
-        self.selection_stop = self.mouse_released_pos
+        #self.selection_start = self.mouse_pressed_pos
+        #self.selection_stop = self.mouse_released_pos
             
         # Update current index to start frame (like JES)
         self.current_pixel_position = self.mouse_pressed_pos
                 
-        self.sample_panel.update()
+        #self.sample_panel.update()
         self.play_selection_button.config(state=tk.NORMAL)
         self.clear_selection_button.config(state=tk.NORMAL)
         self.play_before_button.config(state=tk.NORMAL)
         self.play_after_button.config(state=tk.NORMAL)
-        self.mouse_dragged_flag = False
+        #self.mouse_dragged_flag = False
             
         # Update the index values to show the start frame
+        self.sample_panel.update()
         self.update_index_values()
+        self.mouse_dragged_flag = False
 
     def makeBar(self):
         self.mouse_pressed_pos = self.mouse_pressed_x
@@ -450,13 +454,35 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         """Handle mouse dragged event."""
         self.mouse_dragged_flag = True
         # Highlight the selection as we drag by simulating mouse release
-        self.mouse_released(event)
+        try:
+            self.mouse_released_x = int(self.sample_panel.canvas.canvasx(event.x))
+        #self.mouse_released(event)
+        except Exception:
+            self.mouse_released_x = event.x
+        self.update_selection_visual()
+
+    def update_selection_visual(self):
+        """Update just the visual selection highlight during drag."""
+        mouse_pressed_pos = self.mouse_pressed_x
+        mouse_released_pos = self.mouse_released_x
+        
+        # Handle right-to-left selection for visual purposes
+        if mouse_pressed_pos > mouse_released_pos:
+            mouse_pressed_pos, mouse_released_pos = mouse_released_pos, mouse_pressed_pos
+        
+        # Update the selection coordinates for drawing
+        self.selection_start = mouse_pressed_pos
+        self.selection_stop = mouse_released_pos
+        
+        # Trigger visual update
+        self.sample_panel.update()
         
     def action_performed_handler(self, command: str):
         """Handle action events from buttons."""
         try:
             if command == "Play Entire Sound":
-                self.sound.play()
+                #self.sound.play()
+                sd.play(np.frombuffer(self.sound.buffer, dtype=np.int16), samplerate=self.sound.sampleRate)
             elif command == "Play Selection":
                 if self.start_frame != self.stop_frame:
                     self.sound.playRange(self.start_frame, self.stop_frame)
