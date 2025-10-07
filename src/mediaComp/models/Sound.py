@@ -486,11 +486,11 @@ class Sound:
 
     # ------------------------ methods ---------------------------------------
 
-    def play(self, blocking=False):
+    def play(self, isBlocking=False):
         """Play a sound - nonblocking
         """
         sd.play(np.frombuffer(self.buffer, dtype=np.int16), samplerate=self.sampleRate)
-        if blocking:
+        if isBlocking:
             sd.wait()
 
     def playRange(self, start, end):
