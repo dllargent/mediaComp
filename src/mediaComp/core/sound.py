@@ -4,10 +4,6 @@ import pygame.midi
 from ..models.Sound import Sound
 from ..models.Sample import Sample
 from ..models.Samples import Samples
-from .utils import getShortPath
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import tkinter as tk
 from ..models.SoundExplorer import SoundExplorer
 
 def samplesToSound(samples) -> Sound:
