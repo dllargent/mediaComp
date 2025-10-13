@@ -6,6 +6,19 @@ from ..models.Sample import Sample
 from ..models.Samples import Samples
 from ..models.SoundExplorer import SoundExplorer
 
+def getSampleAt(sound, index) -> Sample:
+    if not isinstance(sound, Sound):
+        print("getSampleAt(sound,index): First input is not a sound")
+        raise ValueError
+    if index < Sound._SoundIndexOffset:
+        print("You asked for the sample at index: " + str(index) + ".  This number is less than " + str(Sound._SoundIndexOffset) + ".  Please try" + " again using an index in the range [" + str(Sound._SoundIndexOffset) + "," + str(getNumSamples
+        (sound) - 1 + Sound._SoundIndexOffset) + "].")
+        raise ValueError
+    if index > getNumSamples(sound) - 1 + Sound._SoundIndexOffset:
+        print("You are trying to access the sample at index: " + str(index) + ", but the last valid index is at " + str(getNumSamples(sound) - 1 + Sound._SoundIndexOffset))
+        raise ValueError
+    return Sample(sound, index - Sound._SoundIndexOffset)
+
 def samplesToSound(samples) -> Sound:
     maxIndex = max([getIndex(s) for s in samples])
     newSound = makeEmptySound(maxIndex + 1, int(getSamplingRate(samples[0].getSound())))
