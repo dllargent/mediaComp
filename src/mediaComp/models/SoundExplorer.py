@@ -481,8 +481,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         """Handle action events from buttons."""
         try:
             if command == "Play Entire Sound":
-                #self.sound.play()
-                sd.play(np.frombuffer(self.sound.buffer, dtype=np.int16), samplerate=self.sound.sampleRate)
+                self.sound.play()
             elif command == "Play Selection":
                 if self.start_frame != self.stop_frame:
                     self.sound.playRange(self.start_frame, self.stop_frame)

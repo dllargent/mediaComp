@@ -486,13 +486,12 @@ class Sound:
 
     # ------------------------ methods ---------------------------------------
 
-    def play(self):
+    def play(self, isBlocking=False):
         """Play a sound - nonblocking
         """
-        #waveObject = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
-        #self.playbacks.append(waveObject.play())
         sd.play(np.frombuffer(self.buffer, dtype=np.int16), samplerate=self.sampleRate)
-        sd.wait()
+        if isBlocking:
+            sd.wait()
 
     def playRange(self, start, end):
         # bytes_per_frame = self.numChannels * self.sampleWidth
