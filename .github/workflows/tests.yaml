@@ -21,8 +21,13 @@ jobs:
           python-version: '3.10'
       - name: Fix APT mirrors and install system dependencies
         run: |
-          sudo rm -f /etc/apt/sources.list.d/*
-          sudo sed -i 's|mirror+file:/etc/apt/apt-mirrors.txt|http://archive.ubuntu.com/ubuntu/|g' /etc/apt/sources.list
+          # Reset sources.list to include all components
+          sudo bash -c 'cat > /etc/apt/sources.list <<EOF
+          deb http://archive.ubuntu.com/ubuntu noble main universe multiverse restricted
+          deb http://archive.ubuntu.com/ubuntu noble-updates main universe multiverse restricted
+          deb http://archive.ubuntu.com/ubuntu noble-backports main universe multiverse restricted
+          deb http://security.ubuntu.com/ubuntu noble-security main universe multiverse restricted
+          EOF'
           sudo apt-get clean
           sudo apt-get update
           sudo apt-get install -y \
