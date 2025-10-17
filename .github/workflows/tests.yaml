@@ -24,6 +24,19 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry pytest
+          sudo apt-get install -y \
+            freeglut3-dev \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            libgstreamer-plugins-base1.0-dev \
+            libgtk-3-dev \
+            libjpeg-dev \
+            libnotify-dev \
+            libsdl2-dev \
+            libsm-dev \
+            libtiff-dev \
+            libwebkit2gtk-4.0-dev \
+            libxtst-dev
           poetry install
 
       - name: Run tests
