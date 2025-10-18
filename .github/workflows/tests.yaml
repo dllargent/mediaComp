@@ -46,6 +46,8 @@ jobs:
           poetry install
 
       - name: Run tests
-        working-directory: ./mediaComp
+        env:
+          PYTHONPATH: ${{ github.workspace }}/mediaComp
+          working-directory: ${{ github.workspace }}
         run: |
           pytest
