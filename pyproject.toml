@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
   "pillow>11.0.0",
   "pygame>2.5.0",
