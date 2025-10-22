@@ -1,53 +1,31 @@
-name: Publish Package
+name: Python package
 
 on:
-  pull_request: 
+  push:
     branches: [ "master" ]
-  push: 
+  pull_request:
     branches: [ "master" ]
-permissions:
-  contents: read
 
 jobs:
-  test:
-    name: Run Tests (PR)
+  build:
+
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11"]
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.10'
-      - name: Fix APT mirrors and install system dependencies
-        run: |
-          # Reset sources.list to include all components
-          sudo bash -c 'cat > /etc/apt/sources.list <<EOF
-          deb http://archive.ubuntu.com/ubuntu noble main universe multiverse restricted
-          deb http://archive.ubuntu.com/ubuntu noble-updates main universe multiverse restricted
-          deb http://archive.ubuntu.com/ubuntu noble-backports main universe multiverse restricted
-          deb http://security.ubuntu.com/ubuntu noble-security main universe multiverse restricted
-          EOF'
-          sudo apt-get clean
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-3-dev \
-            libwebkit2gtk-4.1-dev \
-            build-essential \
-            libssl-dev \
-            libffi-dev \
-            python3-dev
-
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry pytest
-          poetry install
-
-      - name: Run tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}/mediaComp
-          working-directory: ${{ github.workspace }}
-        run: |
-          pytest
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y libportaudio2 libportaudiocpp0 portaudio19-dev
+        python -m pip install --upgrade pip
+        python -m pip install pytest .
+    - name: Test with pytest
+      run: |
+        pytest
