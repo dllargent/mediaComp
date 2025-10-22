@@ -19,7 +19,7 @@ To install our package run:
 
 ## Help
 
-Even if you are new to mediaComp you should be able to start faily easily. Our abstractions make the functionality of the library intuitive. Full documentation can be found on our [GitHub](https://github.com/dllargent/mediaComp).
+Even if you are new to mediaComp you should be able to start faily easily. Our abstractions make the functionality of the library intuitive. Full documentation can be found on our [GitHub](https://github.com/dllargent/mediaComp/).
 
 ## Credits
 Thank you to everyone who has contributed to this library.
