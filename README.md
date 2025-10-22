@@ -15,7 +15,7 @@ If a message like "Python 3.12.5" is displayed it means Python is installed and 
 
 To install our package run:
 
-```python -m pip install mediaComp```
+```python -m pip install mediaComp[gui]```
 
 ## Help
 
