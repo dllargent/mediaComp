@@ -71,18 +71,11 @@ def getSamples(sound) -> Samples:
     return Samples.getSamples(sound)
 
 
-def play(sound) -> None:
+def play(sound: Sound, isBlocking: bool = False) -> None:
     if not isinstance(sound, Sound):
         print("play(sound): Input is not a sound")
         raise ValueError
-    sound.play()
-
-
-def blockingPlay(sound) -> None:
-    if not isinstance(sound, Sound):
-        print("blockingPlay(sound): Input is not a sound")
-        raise ValueError
-    sound.blockingPlay()
+    sound.play(isBlocking)
 
 def threadedPlay(sound) -> None:
     if not isinstance(sound, Sound):
