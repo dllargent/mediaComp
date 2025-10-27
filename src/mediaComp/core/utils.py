@@ -168,13 +168,36 @@ def _showDialog(title, message):
     root = tk.Tk()
     root.title(title)
     root.resizable(False, False)
-    _center_window(root, 250, 100)
     root.protocol("WM_DELETE_WINDOW", on_close)
 
-    tk.Label(root, text=message).pack(pady=10)
+    # Label that wraps text and resizes naturally
+    label = tk.Label(
+        root,
+        text=message,
+        wraplength=400,  # Controls text wrapping width
+        justify="left",
+        anchor="w"
+    )
+    label.pack(padx=20, pady=(15, 10))
+
     button = tk.Button(root, text="OK", command=on_close)
-    button.pack(pady=5)
-    root.bind("<Return>", lambda event: on_close())
+    button.pack(pady=(0, 15))
+
+    # Let Tk compute how large the window should be
+    root.update_idletasks()
+    width = root.winfo_reqwidth()
+    height = root.winfo_reqheight()
+
+    # Optionally clamp to screen width/height
+    screen_w = root.winfo_screenwidth()
+    screen_h = root.winfo_screenheight()
+    width = min(width, int(screen_w * 0.8))
+    height = min(height, int(screen_h * 0.8))
+
+    # Center and bring forward
+    _center_window(root, width, height)
     _bring_to_front(root)
+
+    # Bind Enter key and run
+    root.bind("<Return>", lambda event: on_close())
     root.mainloop()
-    return None
