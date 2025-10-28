@@ -91,56 +91,39 @@ def stopPlaying(sound) -> None:
     sound.stopPlaying()
 
 
-def playAtRate(sound, rate) -> None:
+def playAtRate(sound, rate, isBlocking: bool = False) -> None:
     if not isinstance(sound, Sound):
         print("playAtRate(sound,rate): First input is not a sound")
         raise ValueError
     if(rate < 1000 or rate > 150000):
         print("The rate {} is not valid. It must be between 1000 and 150000".format(rate))
         raise ValueError
-    sound.playAtRateDur(rate, sound.getLength())
+    sound.playAtRateDur(rate, sound.getLength(), isBlocking)
 
 
-def playAtRateDur(sound, rate, dur) -> None:
+def playAtRateDur(sound, rate, dur, isBlocking: bool = False) -> None:
     if not isinstance(sound, Sound):
         print("playAtRateDur(sound,rate,dur): First input is not a sound")
         raise ValueError
     if(rate < 1000 or rate > 150000):
         print("The rate {} is not valid. It must be between 1000 and 150000".format(rate))
         raise ValueError
-    sound.playAtRateDur(rate, dur)
+    sound.playAtRateDur(rate, dur, isBlocking)
 
 
-def playInRange(sound, start, stop) -> None:
+def playInRange(sound, start, stop, isBlocking: bool = False) -> None:
     if not isinstance(sound, Sound):
         print("playInRange(sound,start,stop): First input is not a sound")
         raise ValueError
-    sound.playAtRateInRange(
-        1, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset)
+    sound.playRange(1, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset, isBlocking)
 
 
-def blockingPlayInRange(sound, start, stop) -> None:
-    if not isinstance(sound, Sound):
-        print("blockingPlayInRange(sound,start,stop): First input is not a sound")
-        raise ValueError
-    sound.blockingPlayAtRateInRange(
-        1, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset)
-
-
-def playAtRateInRange(sound, rate, start, stop) -> None:
+def playAtRateInRange(sound, rate, start, stop, isBlocking) -> None:
     if not isinstance(sound, Sound):
         print("playAtRateInRAnge(sound,rate,start,stop): First input is not a sound")
         raise ValueError
-    sound.playAtRateInRange(
-        rate, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset)
+    sound.playAtRateInRange(rate, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset, isBlocking)
 
-
-def blockingPlayAtRateInRange(sound, rate, start, stop) -> None:
-    if not isinstance(sound, Sound):
-        print("blockingPlayAtRateInRange(sound,rate,start,stop): First input is not a sound")
-        raise ValueError
-    sound.blockingPlayAtRateInRange(
-        rate, start - Sound._SoundIndexOffset, stop - Sound._SoundIndexOffset)
     
 def getSamplingRate(sound) -> int:
     if not isinstance(sound, Sound):

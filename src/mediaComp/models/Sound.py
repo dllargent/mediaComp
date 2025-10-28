@@ -493,14 +493,8 @@ class Sound:
         if isBlocking:
             sd.wait()
 
-    def playRange(self, start, end):
-        # bytes_per_frame = self.numChannels * self.sampleWidth
-        # start_byte = start * bytes_per_frame  
-        # end_byte = end * bytes_per_frame
-    
-        # wave = sa.WaveObject(self.buffer[start_byte:end_byte], self.numChannels, self.sampleWidth, self.sampleRate)
-        # self.playbacks.append(wave.play())
-        dtype = np.int16 if self.sampleWidth == 2 else np.uint8  # common cases
+    def playRange(self, start, end, isBlocking=False):
+        dtype = np.int16 if self.sampleWidth == 2 else np.uint8 
         audio_array = np.frombuffer(self.buffer, dtype=dtype)
 
         # Reshape if stereo/multichannel
@@ -510,20 +504,10 @@ class Sound:
         # Slice frames
         segment = audio_array[start:end]
         sd.play(segment, samplerate=self.sampleRate)
+        if isBlocking:
+            sd.wait()
 
-    def blockingPlay(self):
-        # try:
-        #     wave = sa.WaveObject(self.buffer, self.numChannels, self.sampleWidth, self.sampleRate)
-        #     playback = wave.play()
-        #     playback.wait_done()
-        #     del wave
-        #     del playback
-        # except Exception as e:
-        #     print("Playback error:", e)
-        sd.play(np.frombuffer(self.buffer, dtype=np.int16), samplerate=self.sampleRate)
-        sd.wait()
-
-    def playAtRateDur(self, rate, duration):
+    def playAtRateDur(self, rate, duration, isBlocking=False):
         
         dtype = np.int16 if self.sampleWidth == 2 else np.uint8  # common cases
         audio_array = np.frombuffer(self.buffer, dtype=dtype)
@@ -535,7 +519,8 @@ class Sound:
         # Slice frames
         segment = audio_array[0:duration]
         sd.play(segment, samplerate=rate)
-        sd.wait()
+        if isBlocking:
+            sd.wait()
 
     def stopPlaying(self):
         """Stop playback of all currently playing sounds
