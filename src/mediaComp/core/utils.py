@@ -130,11 +130,12 @@ def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
     root = tk.Tk()
     root.title(title)
     root.resizable(False, False)
-    _center_window(root, 250, 130)
-    _bring_to_front(root)
+    #_center_window(root, 250, 130)
+    #_bring_to_front(root)
     root.protocol("WM_DELETE_WINDOW", on_close)
 
-    tk.Label(root, text=message).pack(pady=10)
+    msg_label = tk.Label(root, text=message, wraplength=300, justify="center")
+    msg_label.pack(pady=10)
     def submit():
         if typeOfDialog == "requestInt":
             try:
@@ -158,6 +159,10 @@ def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
     tk.Button(root, text="OK", command=submit).pack(pady=5)
     error_label = tk.Label(root, text="", fg="red")
     error_label.pack()
+
+    root.update_idletasks()
+    _center_window(root, root.winfo_reqwidth(), root.winfo_reqheight())
+    _bring_to_front(root)
     root.mainloop()
     return result["value"]
 
