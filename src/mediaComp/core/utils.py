@@ -5,6 +5,7 @@ from math import inf
 import tkinter as tk
 from tkinter import messagebox
 from ..models.Config import ConfigManager
+from pathlib import Path
 
 config = ConfigManager() 
 
@@ -175,6 +176,17 @@ def _showDialog(title, message):
     root.resizable(False, False)
     _center_window(root, 250, 100)
     root.protocol("WM_DELETE_WINDOW", on_close)
+
+    match title:
+        case "Warning":
+            icon = Path(__file__).resolve().parent.parent / "assets" / f"warning.png"
+        case "Information":
+            icon = Path(__file__).resolve().parent.parent / "assets" / f"info.png"
+        case "Error":
+            icon = Path(__file__).resolve().parent.parent / "assets" / f"error.png"
+
+    img = tk.PhotoImage(file=icon)
+    root.iconphoto(True, img)
 
     tk.Label(root, text=message).pack(pady=10)
     button = tk.Button(root, text="OK", command=on_close)
