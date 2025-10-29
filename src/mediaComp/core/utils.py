@@ -5,6 +5,7 @@ from math import inf
 import tkinter as tk
 from tkinter import messagebox
 from ..models.Config import ConfigManager
+from pathlib import Path
 
 config = ConfigManager() 
 
@@ -130,11 +131,12 @@ def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
     root = tk.Tk()
     root.title(title)
     root.resizable(False, False)
-    _center_window(root, 250, 130)
-    _bring_to_front(root)
+    #_center_window(root, 250, 130)
+    #_bring_to_front(root)
     root.protocol("WM_DELETE_WINDOW", on_close)
 
-    tk.Label(root, text=message).pack(pady=10)
+    msg_label = tk.Label(root, text=message, wraplength=300, justify="center")
+    msg_label.pack(pady=10)
     def submit():
         if typeOfDialog == "requestInt":
             try:
@@ -158,6 +160,10 @@ def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
     tk.Button(root, text="OK", command=submit).pack(pady=5)
     error_label = tk.Label(root, text="", fg="red")
     error_label.pack()
+
+    root.update_idletasks()
+    _center_window(root, root.winfo_reqwidth(), root.winfo_reqheight())
+    _bring_to_front(root)
     root.mainloop()
     return result["value"]
 
@@ -170,16 +176,18 @@ def _showDialog(title, message):
     root.resizable(False, False)
     root.protocol("WM_DELETE_WINDOW", on_close)
 
-    # Label that wraps text and resizes naturally
-    label = tk.Label(
-        root,
-        text=message,
-        wraplength=400,  # Controls text wrapping width
-        justify="left",
-        anchor="w"
-    )
-    label.pack(padx=20, pady=(15, 10))
+    match title:
+        case "Warning":
+            icon = Path(__file__).resolve().parent.parent / "assets" / f"warning.png"
+        case "Information":
+            icon = Path(__file__).resolve().parent.parent / "assets" / f"info.png"
+        case "Error":
+            icon = Path(__file__).resolve().parent.parent / "assets" / f"error.png"
 
+    img = tk.PhotoImage(file=icon)
+    root.iconphoto(True, img)
+
+    tk.Label(root, text=message).pack(pady=10)
     button = tk.Button(root, text="OK", command=on_close)
     button.pack(pady=(0, 15))
 
