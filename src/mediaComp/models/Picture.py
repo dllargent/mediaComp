@@ -1,5 +1,5 @@
 from . import File_Chooser as FileChooser
-import os, wx, tempfile, subprocess, sys, atexit, pickle
+import os, tempfile, subprocess, sys, atexit, pickle
 from subprocess import PIPE
 import PIL.ImageDraw, PIL.Image
 from .PixelColor import Pixel, Color
@@ -738,6 +738,7 @@ class Picture:
         wx.Image
             the converted image
         """
+        import wx
         orig_width, orig_height = self.image.size
         wx_img = wx.Image(orig_width, orig_height)
         wx_img.SetData(self.image.convert('RGB').tobytes())
