@@ -15,11 +15,11 @@ If a message like "Python 3.12.5" is displayed it means Python is installed and 
 
 To install our package run:
 
-```python -m pip install mediaComp```
+```python -m pip install mediaComp[gui]```
 
 ## Help
 
-Even if you are new to mediaComp you should be able to start faily easily. Our abstractions make the functionality of the library intuitive. Full documentation can be found on our [GitHub](https://github.com/dllargent/mediaComp).
+Even if you are new to mediaComp you should be able to start faily easily. Our abstractions make the functionality of the library intuitive. Full documentation can be found on our [GitHub](https://github.com/dllargent/mediaComp/).
 
 ## Credits
 Thank you to everyone who has contributed to this library.

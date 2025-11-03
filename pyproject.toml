@@ -4,14 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.4.2"
+version = "0.4.7"
 dependencies = [
-  "wxPython > 4.2.0",
-  "pillow >11.0.0",
-  "pygame > 2.5.0",
-  "matplotlib >= 3.10.0",
-  "numpy >= 2.2.1",
-  "sounddevice >= 0.5.2",
+  "pillow>11.0.0",
+  "pygame>2.5.0",
+  "matplotlib>=3.10.0",
+  "numpy>=2.2.1",
+  "sounddevice>=0.5.2",
 ]
 authors = [
   { name="A community project", email="dllargent@bsu.edu" },
@@ -19,7 +18,7 @@ authors = [
 
 description = "A multimedia processing library for Python 3."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
@@ -27,9 +26,18 @@ classifiers = [
 license = "GPL-3.0-or-later"
 license-files = ["LICEN[CS]E*"]
 
+[project.optional-dependencies]
+gui = ["wxPython>=4.2.0"]
+
+
 [project.urls]
 Homepage = "https://github.com/dllargent/mediaComp"
 Issues = "https://github.com/dllargent/mediaComp/issues"
+
+[tool.poetry]
+packages = [
+    { include = "mediaComp", from = "src" }
+]
 
 [tool.setuptools.package-data]
 "mediaComp" = ["py.typed", "*.pyi"]

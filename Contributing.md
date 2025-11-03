@@ -2,7 +2,7 @@
 
 ## Setting up your environment
 
-- Install he necessary dependencies found on the README.md
+- Install the necessary dependencies found on the README.md
 - Clone the repository
 - Open in VSCode
 - From the root of the repository make a branch 
