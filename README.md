@@ -29,7 +29,8 @@ Thank you to everyone who has contributed to this library.
 - Santos Pena
 
 ## Dependencies
-MediaComp is strongly dependent on several libraries. Most of the these will install with the package, ***however*** Windows users will need to download and install the Visual Studio Build Tools for C/C++ development (see documentation).
+MediaComp is strongly dependent on several libraries. Most of the these will install with the package, ***however*** to make sure you get wxPython with the package, install it with 
+```pip install mediaComp[gui]```.
 
 | Dependency | Version |
 | :-----:| :-----: |
@@ -39,6 +40,10 @@ MediaComp is strongly dependent on several libraries. Most of the these will ins
 | matplotlib | >= 3.10.0 |
 | numpy | >= 2.2.1 |
 | sounddevice | >= 0.5.2 |
+
+## Tested IDEs
+
+MediaComp is primarily used in the [Thonny IDE](https://thonny.org/), but has been used in [VSCode](https://code.visualstudio.com/) and [JetBrains PyCharm](https://www.jetbrains.com/pycharm/) as well. If you encounter an issue using any of the three IDE's, [submit an issue](https://github.com/dllargent/mediaComp/issues)! 
 
 ## License
 This package is distributed under GPL 3.0-or-later, which can be found in our GitHub repository in ```LICENSE```. This means you can basically use mediaComp in any project you want. Any changes or additions made the package must also be released with a compatible license.
