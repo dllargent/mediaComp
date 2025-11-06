@@ -253,6 +253,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.zoom_in_width: int = sound.getLengthInFrames()
         self.sample_width: int = self.zoom_out_width
         self.frames_per_pixel: float = sound.getLengthInFrames() / self.sample_width
+        self.MAX_FRAMES_PER_PIXEL = self.frames_per_pixel
         self.sample_height: int = 201
         
         # Current pixel position
@@ -524,28 +525,38 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             self.update_index_values()
             self.sample_panel.update()
             self.check_scroll()
+            self.update_zoom_buttons()
             
-            if self.frames_per_pixel == 1:
-                self.zoom_button.config(text="Zoom Out")
     
     def handle_zoom_out(self):
         """Handle zoom out - simplified."""
-        self.zoom_button.config(text="Zoom Out")
         
-        self.sample_width = self.zoom_out_width
-        self.frames_per_pixel = self.sound.getLengthInFrames() / self.sample_width
+        # Increase frames_per_pixel (zooming out)
+        self.frames_per_pixel = min(self.MAX_FRAMES_PER_PIXEL, self.frames_per_pixel * 2)
+        self.sample_width = int(self.sound.getLengthInFrames() / self.frames_per_pixel)
         
-        if self.debug:
-            print(f"Zoom Out: currentPixelPosition = {self.current_pixel_position}")
-        # Update panel sizes and recreate waveform
+        # Update display
         self._update_panel_sizes()
         self.sample_panel.create_wave_form()
-        
-        
         self.update_index_values()
-        self.zoom_button.config(text="Zoom In")
         self.sample_panel.update()
         self.check_scroll()
+        self.update_zoom_buttons()
+
+    def update_zoom_buttons(self):
+        """Enable or disable zoom buttons based on current zoom level."""
+        can_zoom_in = self.frames_per_pixel > 1
+        can_zoom_out = self.frames_per_pixel < self.MAX_FRAMES_PER_PIXEL
+
+        if can_zoom_in:
+            self.zoom_in_button["state"] = tk.NORMAL
+        else:
+            self.zoom_in_button["state"] = tk.DISABLED
+        if can_zoom_out:
+            self.zoom_out_button["state"] = tk.NORMAL
+        else:
+            self.zoom_out_button["state"] = tk.DISABLED
+
     
     def check_scroll(self):
         """Check that the current position is in the viewing area and scroll if needed."""
@@ -725,10 +736,12 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         
         # Create zoom panel with zoom button
         self.zoom_button_panel = tk.Frame(self.info_panel)
-        self.zoom_button = self.make_button("Zoom In", True, self.zoom_button_panel)
+        
+
         
         index_panel.pack(side=tk.TOP, fill=tk.X)
         self.zoom_button_panel.pack(side=tk.BOTTOM, fill=tk.X)
+        self.zoom_button_panel.pack_configure(anchor="center")
     
     def setup_index_panel(self, index_panel: tk.Frame):
         """Set up the index panel with navigation buttons and value displays."""
@@ -765,18 +778,31 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.next_button.pack(side=tk.LEFT, padx=2)
         self.last_button.pack(side=tk.LEFT, padx=2)
         
+        
         # Bottom panel for frames per pixel
-        bottom_panel = tk.Frame(index_panel)
-        frames_label = tk.Label(bottom_panel, text="Samples between pixels: ")
-        self.num_samples_per_pixel_field = tk.Entry(bottom_panel, width=10)
+        middle_panel = tk.Frame(index_panel)
+        frames_label = tk.Label(middle_panel, text="Samples between pixels: ")
+        self.num_samples_per_pixel_field = tk.Entry(middle_panel, width=10)
         self.num_samples_per_pixel_field.insert(0, str(int(self.frames_per_pixel)))
         self.num_samples_per_pixel_field.bind('<Return>', self._frames_per_pixel_changed)
         
+
         frames_label.pack(side=tk.LEFT)
         self.num_samples_per_pixel_field.pack(side=tk.LEFT)
         
+        bottom_panel = tk.Frame(index_panel)
+
+        # Create zoom buttons
+        self.zoom_in_button = self.make_button("Zoom In", True, bottom_panel)
+        self.zoom_out_button = self.make_button("Zoom Out", False, bottom_panel)
+
+        self.zoom_in_button.pack(side=tk.LEFT, padx=10)
+        self.zoom_out_button.pack(side=tk.LEFT, padx=10)
+        
+
         # Pack panels
         top_panel.pack(side=tk.TOP, pady=2)
+        middle_panel.pack(side=tk.TOP, pady=5)
         bottom_panel.pack(side=tk.BOTTOM, pady=2)
         index_panel.pack(fill=tk.X)
     
