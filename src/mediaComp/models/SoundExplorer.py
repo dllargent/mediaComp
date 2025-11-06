@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import ttk
 from .Sound import Sound
 import re
+import sounddevice as sd
+import numpy as np
 
 class MouseMotionListener(ABC):
     @abstractmethod
@@ -382,7 +384,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             
         if self.mouse_pressed_pos > self.mouse_released_pos:  # Selected right to left
             self.mouse_pressed_pos, self.mouse_released_pos = self.mouse_released_pos, self.mouse_pressed_pos
-                
+        
         self.start_frame = int(self.mouse_pressed_pos * self.frames_per_pixel)
         self.stop_frame = int(self.mouse_released_pos * self.frames_per_pixel)
                 
@@ -398,21 +400,23 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.stop_index_label.config(text=self.STOP_INDEX_TEXT + str(self.stop_frame))
             
         # For highlighting the selection
-        self.selection_start = self.mouse_pressed_pos
-        self.selection_stop = self.mouse_released_pos
+        #self.selection_start = self.mouse_pressed_pos
+        #self.selection_stop = self.mouse_released_pos
             
         # Update current index to start frame (like JES)
         self.current_pixel_position = self.mouse_pressed_pos
                 
-        self.sample_panel.update()
+        #self.sample_panel.update()
         self.play_selection_button.config(state=tk.NORMAL)
         self.clear_selection_button.config(state=tk.NORMAL)
         self.play_before_button.config(state=tk.NORMAL)
         self.play_after_button.config(state=tk.NORMAL)
-        self.mouse_dragged_flag = False
+        #self.mouse_dragged_flag = False
             
         # Update the index values to show the start frame
+        self.sample_panel.update()
         self.update_index_values()
+        self.mouse_dragged_flag = False
 
     def makeBar(self):
         self.mouse_pressed_pos = self.mouse_pressed_x
@@ -450,7 +454,28 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         """Handle mouse dragged event."""
         self.mouse_dragged_flag = True
         # Highlight the selection as we drag by simulating mouse release
-        self.mouse_released(event)
+        try:
+            self.mouse_released_x = int(self.sample_panel.canvas.canvasx(event.x))
+        #self.mouse_released(event)
+        except Exception:
+            self.mouse_released_x = event.x
+        self.update_selection_visual()
+
+    def update_selection_visual(self):
+        """Update just the visual selection highlight during drag."""
+        mouse_pressed_pos = self.mouse_pressed_x
+        mouse_released_pos = self.mouse_released_x
+        
+        # Handle right-to-left selection for visual purposes
+        if mouse_pressed_pos > mouse_released_pos:
+            mouse_pressed_pos, mouse_released_pos = mouse_released_pos, mouse_pressed_pos
+        
+        # Update the selection coordinates for drawing
+        self.selection_start = mouse_pressed_pos
+        self.selection_stop = mouse_released_pos
+        
+        # Trigger visual update
+        self.sample_panel.update()
         
     def action_performed_handler(self, command: str):
         """Handle action events from buttons."""
@@ -700,10 +725,12 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         
         # Create zoom panel with zoom button
         self.zoom_button_panel = tk.Frame(self.info_panel)
-        self.zoom_button = self.make_button("Zoom In", True, self.zoom_button_panel)
+        
+
         
         index_panel.pack(side=tk.TOP, fill=tk.X)
         self.zoom_button_panel.pack(side=tk.BOTTOM, fill=tk.X)
+        self.zoom_button_panel.pack_configure(anchor="center")
     
     def setup_index_panel(self, index_panel: tk.Frame):
         """Set up the index panel with navigation buttons and value displays."""
@@ -740,18 +767,31 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.next_button.pack(side=tk.LEFT, padx=2)
         self.last_button.pack(side=tk.LEFT, padx=2)
         
+        
         # Bottom panel for frames per pixel
-        bottom_panel = tk.Frame(index_panel)
-        frames_label = tk.Label(bottom_panel, text="Samples between pixels: ")
-        self.num_samples_per_pixel_field = tk.Entry(bottom_panel, width=10)
+        middle_panel = tk.Frame(index_panel)
+        frames_label = tk.Label(middle_panel, text="Samples between pixels: ")
+        self.num_samples_per_pixel_field = tk.Entry(middle_panel, width=10)
         self.num_samples_per_pixel_field.insert(0, str(int(self.frames_per_pixel)))
         self.num_samples_per_pixel_field.bind('<Return>', self._frames_per_pixel_changed)
         
+
         frames_label.pack(side=tk.LEFT)
         self.num_samples_per_pixel_field.pack(side=tk.LEFT)
         
+        bottom_panel = tk.Frame(index_panel)
+
+        # Create zoom buttons
+        self.zoom_in_button = self.make_button("Zoom In", True, bottom_panel)
+        self.zoom_out_button = self.make_button("Zoom Out", False, bottom_panel)
+
+        self.zoom_in_button.pack(side=tk.LEFT, padx=10)
+        self.zoom_out_button.pack(side=tk.LEFT, padx=10)
+        
+
         # Pack panels
         top_panel.pack(side=tk.TOP, pady=2)
+        middle_panel.pack(side=tk.TOP, pady=5)
         bottom_panel.pack(side=tk.BOTTOM, pady=2)
         index_panel.pack(fill=tk.X)
     
