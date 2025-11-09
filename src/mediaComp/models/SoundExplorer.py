@@ -839,8 +839,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         except Exception:
             sel = None
         self.index_value.config(state='normal')
-        self.index_value.delete(0, tk.END)
-        self.index_value.insert(0, str(cur_frame))
+        # self.index_value.delete(0, tk.END)
+        # self.index_value.insert(0, str(cur_frame))
         # Restore selection if user had selected text
         try:
             if sel is not None:
