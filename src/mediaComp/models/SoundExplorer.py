@@ -988,6 +988,15 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             self.update_index_values()
             self.check_scroll()
             self.sample_panel.update()
+            canvas_width = self.sample_panel.canvas.winfo_width()
+            bar_x = self.current_pixel_position
+
+            scroll_region = self.sample_panel.canvas.bbox("all")
+            if scroll_region :
+                total_width = scroll_region[2] - scroll_region[0]
+                target_fraction = max(0, min((bar_x - canvas_width // 2) / total_width, 1))
+                self.sample_panel.canvas.xview_moveto(target_fraction)
+                self.sample_panel.update()
 
             # Update play before/after based on new index
             cur_frame = index
