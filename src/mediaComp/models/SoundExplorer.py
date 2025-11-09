@@ -785,7 +785,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.num_samples_per_pixel_field = tk.Entry(middle_panel, width=10)
         self.num_samples_per_pixel_field.insert(0, str(int(self.frames_per_pixel)))
         self.num_samples_per_pixel_field.bind('<Return>', self._frames_per_pixel_changed)
-        
+        sample_rate_label = tk.Label(middle_panel, text=f"Sample Rate: {self.sound.sampleRate} Hz")
+        sample_rate_label.pack(side=tk.RIGHT, padx=5)
 
         frames_label.pack(side=tk.LEFT)
         self.num_samples_per_pixel_field.pack(side=tk.LEFT)
@@ -839,8 +840,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         except Exception:
             sel = None
         self.index_value.config(state='normal')
-        self.index_value.delete(0, tk.END)
-        self.index_value.insert(0, str(cur_frame))
+        # self.index_value.delete(0, tk.END)
+        # self.index_value.insert(0, str(cur_frame))
         # Restore selection if user had selected text
         try:
             if sel is not None:
@@ -988,6 +989,15 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
             self.update_index_values()
             self.check_scroll()
             self.sample_panel.update()
+            canvas_width = self.sample_panel.canvas.winfo_width()
+            bar_x = self.current_pixel_position
+
+            scroll_region = self.sample_panel.canvas.bbox("all")
+            if scroll_region :
+                total_width = scroll_region[2] - scroll_region[0]
+                target_fraction = max(0, min((bar_x - canvas_width // 2) / total_width, 1))
+                self.sample_panel.canvas.xview_moveto(target_fraction)
+                self.sample_panel.update()
 
             # Update play before/after based on new index
             cur_frame = index
