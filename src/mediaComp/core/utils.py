@@ -76,7 +76,7 @@ def calculateNeededFiller(message, width=100) -> str:
     return fillerNeeded * " "
 
 def requestNumber(message) -> int:
-    return _requestInfoDialog("Enter a Number", message, "requestInt")
+    return _requestInfoDialog("Enter a Number", message, "requestNum")
 
 def requestInteger(message) -> int:
     return _requestInfoDialog("Enter an Integer", message, "requestInt")
@@ -129,6 +129,14 @@ def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
                     error_label.config(text=f"Enter a number between {min_val} and {max_val}")
             except ValueError:
                 error_label.config(text="Please enter a valid integer")
+        elif typeOfDialog == "requestNum":
+            try:
+                value = float(entry.get())
+                result["value"] = value
+                window.destroy()
+                _cleanup_if_last_window()
+            except ValueError:
+                error_label.config(text="Please enter a valid number")
         else:
             result["value"] = entry.get()
             window.destroy()
