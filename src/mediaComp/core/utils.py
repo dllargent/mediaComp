@@ -98,24 +98,22 @@ def showError(message) -> None:
     _showDialog("Error", message)
 
 def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
-    root = get_root()
     if min_val >= max_val:
         raise ValueError("min_val >= max_val not allowed")
     result = {"value": None}
 
     def on_close():
         result["value"] = None
-        window.destroy()
+        root.destroy()
 
-    window = tk.Toplevel(root)
-    window.title(title)
-    window.resizable(False, False)
-    window.minsize(250, 130)
+    root = tk.Tk()
+    root.title(title)
+    root.resizable(False, False)
     #_center_window(root, 250, 130)
     #_bring_to_front(root)
-    window.protocol("WM_DELETE_WINDOW", on_close)
+    root.protocol("WM_DELETE_WINDOW", on_close)
 
-    msg_label = tk.Label(window, text=message, wraplength=300, justify="center")
+    msg_label = tk.Label(root, text=message, wraplength=300, justify="center")
     msg_label.pack(pady=10)
     def submit():
         if typeOfDialog == "requestInt":
@@ -123,8 +121,7 @@ def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
                 value = int(entry.get())
                 if min_val <= value <= max_val:
                     result["value"] = value
-                    window.destroy()
-                    _cleanup_if_last_window()
+                    root.destroy()
                 else:
                     error_label.config(text=f"Enter a number between {min_val} and {max_val}")
             except ValueError:
@@ -133,42 +130,36 @@ def _requestInfoDialog(title, message, typeOfDialog, min_val=-inf, max_val=inf):
             try:
                 value = float(entry.get())
                 result["value"] = value
-                window.destroy()
-                _cleanup_if_last_window()
+                root.destroy()
             except ValueError:
                 error_label.config(text="Please enter a valid number")
         else:
             result["value"] = entry.get()
-            window.destroy()
-            _cleanup_if_last_window
+            root.destroy()
 
-    entry = tk.Entry(window, width=30)
+    entry = tk.Entry(root, width=30)
     entry.pack(pady=5)
     entry.focus_set()
 
     entry.bind("<Return>", lambda event: submit())
-    tk.Button(window, text="OK", command=submit).pack(pady=5)
-    error_label = tk.Label(window, text="", fg="red")
+    tk.Button(root, text="OK", command=submit).pack(pady=5)
+    error_label = tk.Label(root, text="", fg="red")
     error_label.pack()
 
-    window.update_idletasks()
-    _center_window(window, window.winfo_reqwidth(), window.winfo_reqheight())
-    _bring_to_front(window)
-    window.wait_window()
+    root.update_idletasks()
+    _center_window(root, root.winfo_reqwidth(), root.winfo_reqheight())
+    _bring_to_front(root)
+    root.mainloop()
     return result["value"]
 
 def _showDialog(title, message):
-    root = get_root()
-
     def on_close():
-        dialog.destroy()
-        _cleanup_if_last_window()
+        root.destroy()
 
-    dialog = tk.Toplevel(root)
-    dialog.title(title)
-    dialog.resizable(False, False)
-    _center_window(dialog, 250, 100)
-    dialog.protocol("WM_DELETE_WINDOW", on_close)
+    root = tk.Tk()
+    root.title(title)
+    root.resizable(False, False)
+    root.protocol("WM_DELETE_WINDOW", on_close)
 
     match title:
         case "Warning":
@@ -179,16 +170,30 @@ def _showDialog(title, message):
             icon = Path(__file__).resolve().parent.parent / "assets" / f"error.png"
 
     img = tk.PhotoImage(file=icon)
-    dialog.iconphoto(True, img)
+    root.iconphoto(True, img)
 
-    tk.Label(dialog, text=message).pack(pady=10)
-    button = tk.Button(dialog, text="OK", command=on_close)
-    button.pack(pady=5)
-    dialog.bind("<Return>", lambda event: on_close())
-    _bring_to_front(dialog)
-    dialog.grab_set()
-    dialog.wait_window()
-    return None
+    tk.Label(root, text=message, wraplength=300, justify="center").pack(pady=10)
+    button = tk.Button(root, text="OK", command=on_close)
+    button.pack(pady=(0, 15))
+
+    # Let Tk compute how large the window should be
+    root.update_idletasks()
+    width = root.winfo_reqwidth()
+    height = root.winfo_reqheight()
+
+    # Optionally clamp to screen width/height
+    screen_w = root.winfo_screenwidth()
+    screen_h = root.winfo_screenheight()
+    width = min(width, int(screen_w * 0.8))
+    height = min(height, int(screen_h * 0.8))
+
+    # Center and bring forward
+    _center_window(root, width, height)
+    _bring_to_front(root)
+
+    # Bind Enter key and run
+    root.bind("<Return>", lambda event: on_close())
+    root.mainloop()
 
 def _center_window(root, width, height):
     root.update_idletasks()
