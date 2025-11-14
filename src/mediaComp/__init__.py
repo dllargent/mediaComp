@@ -29,12 +29,10 @@ from .core import (
         getPixelAt, setRed, setGreen, setBlue, getRed, getGreen, getBlue, getColor, setColor, getX, getY,
         writePictureTo, setAllPixelsToAColor, copyInto, duplicatePicture, cropPicture, calculateNeededFiller,
         requestInteger, requestNumber, requestIntegerInRange, requestString, showWarning, showInformation, showError,
-        playMovie, writeQuicktime, writeAVI, makeMovie, makeMovieFromInitialFile, addFrameToMovie, writeFramesToDirectory,
         samplesToSound, makeSound, makeEmptySound, makeEmptySoundBySeconds, duplicateSound, getSamples, soundTool,
         play, stopPlaying, playAtRate, playAtRateDur, getSampleAt, playInRange, playAtRateInRange, getSamplingRate, getSampleValueAt, setSampleValueAt, setSampleValue,
         getSampleValue, getSound, getNumSamples, getDuration, writeSoundTo, randomSamples, getIndex,
-        playNote, turn, turnRight, turnToFace, turnLeft, forward, backward, moveTo, makeTurtle, penUp,
-        penDown, drop, getXPos, getYPos, getHeading, makeWorld, getTurtleList, blue, red,
+        playNote, blue, red,
         green, gray, darkGray, lightGray, yellow, orange, pink, magenta, cyan, white, black
     )
 
@@ -47,12 +45,10 @@ __all__ = [
     "getPixelAt", "setRed", "setGreen", "setBlue", "getRed", "getGreen", "getSampleAt", "getBlue", "getColor", "setColor", "getX", "getY", 
     "writePictureTo", "setAllPixelsToAColor", "copyInto", "duplicatePicture", "cropPicture", "calculateNeededFiller",
     "requestInteger", "requestNumber", "requestIntegerInRange", "requestString", "showWarning", "showInformation", "showError",
-    "playMovie", "writeQuicktime", "writeAVI", "makeMovie", "makeMovieFromInitialFile", "addFrameToMovie", "writeFramesToDirectory", 
     "samplesToSound", "makeSound", "makeEmptySound", "makeEmptySoundBySeconds", "duplicateSound", "getSamples", "soundTool", 
     "play", "stopPlaying", "playAtRate", "playAtRateDur", "playInRange", "playAtRateInRange", "getSamplingRate", "getSampleValueAt", "setSampleValueAt", "setSampleValue", 
     "getSampleValue", "getSound", "getNumSamples", "getDuration", "writeSoundTo", "randomSamples", "getIndex", 
-    "playNote", "turn", "turnRight", "turnToFace", "turnLeft", "forward", "backward", "moveTo", "makeTurtle", "penUp", 
-    "penDown", "drop", "getXPos", "getYPos", "getHeading", "makeWorld", "getTurtleList", "blue", "red", 
+    "playNote", "blue", "red", 
     "green", "gray", "darkGray", "lightGray", "yellow", "orange", "pink", "magenta", "cyan", "white", "black", "config"
 ]
 

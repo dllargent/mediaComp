@@ -1,10 +1,8 @@
 from .SoundSample import SoundSample
 import wave
 import os
-#import simpleaudio as sa
 import pygame
 import threading
-
 import sounddevice as sd
 import numpy as np
 

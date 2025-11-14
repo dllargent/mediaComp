@@ -37,7 +37,6 @@ MediaComp is strongly dependent on several libraries. Most of the these will ins
 | wxPython | > 4.2.0 |
 | pillow | > 11.0.0 |
 | pygame | > 2.5.0 |
-| matplotlib | >= 3.10.0 |
 | numpy | >= 2.2.1 |
 | sounddevice | >= 0.5.2 |
 

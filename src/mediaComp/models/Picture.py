@@ -1,5 +1,5 @@
 from . import File_Chooser as FileChooser
-import os, tempfile, subprocess, sys, atexit, pickle
+import os, tempfile, subprocess, sys, pickle
 from subprocess import PIPE
 import PIL.ImageDraw, PIL.Image
 from .PixelColor import Pixel, Color
