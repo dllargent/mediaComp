@@ -4,8 +4,6 @@ import tkinter as tk
 from tkinter import ttk
 from .Sound import Sound
 import re
-import sounddevice as sd
-import numpy as np
 
 class MouseMotionListener(ABC):
     @abstractmethod

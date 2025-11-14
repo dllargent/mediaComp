@@ -8,7 +8,6 @@ version = "0.4.10"
 dependencies = [
   "pillow>11.0.0",
   "pygame>2.5.0",
-  "matplotlib>=3.10.0",
   "numpy>=2.2.1",
   "sounddevice>=0.5.2",
 ]

@@ -3,7 +3,6 @@ import sys
 import subprocess
 from math import inf
 import tkinter as tk
-from tkinter import messagebox
 from ..models.Config import ConfigManager
 from pathlib import Path
 from mediaComp import get_root, _cleanup_if_last_window
