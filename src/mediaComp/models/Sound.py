@@ -254,26 +254,8 @@ class Sound:
             samples.append(SoundSample(self, i))
         return samples
     
-    def getSampleValueAt(self, index):
-        """Get the sample at the passed index and handle any SoundExceptions
-
-        Parameters
-        ----------
-        index : int
-            the desired index
-
-        Returns
-        -------
-        int
-            the sample value
-        """
-        try:
-            value = self.getSampleValue(index)
-        except:
-            raise(IndexError("The index {} is not valid for this sound".format(index)))
-        return value
     
-    def getSampleValue(self, frameNum):
+    def getSampleValueAt(self, index):
         """Sets the value of the sample at the indicated frame
         
         If this is a mono sound, obtains the single sample contained
@@ -282,7 +264,7 @@ class Sound:
 
         Parameters
         ----------
-        frameNum : int
+        index : int
             the index of the frame to access
 
         Returns
@@ -290,7 +272,7 @@ class Sound:
         int
             integer representation of the bytes contained within frame
         """
-        n = frameNum * self.sampleWidth * self.numChannels
+        n = index * self.sampleWidth * self.numChannels
         m = n + self.sampleWidth
         return int.from_bytes(self.buffer[n:m], byteorder='little', signed=True)    
 
@@ -309,7 +291,7 @@ class Sound:
         """
         if not self.isStereo():
             print("Sound is not stereo, cannot access left value")
-        return self.getSampleValue(frameNum)
+        return self.getSampleValueAt(frameNum)
 
     def getRightSample(self, frameNum):
         """Obtains the right sample contained at the specified frame
@@ -398,22 +380,8 @@ class Sound:
             for i in range(self.sampleWidth):
                 self.buffer[frameNum * self.sampleWidth + i] = frame[i]
 
+
     def setSampleValueAt(self, index, value):
-        """Method to set the sample value at the specified index
-
-        Parameters
-        ----------
-        index : int
-            the index
-        value : int or float
-            the new value
-        """
-        try:
-            self.setSampleValue(index, int(value))
-        except:
-            raise(IndexError("The index {} is not valid for this sound".format(index)))
-
-    def setSampleValue(self, frameNum, value):
         """Sets the value of the sample found at the specified frame
         
         If this sound has more than one channel, then we default to setting
@@ -422,12 +390,12 @@ class Sound:
     
         Parameters
         ----------
-        frameNum : int
+        index : int
             the index of the frame where the sample should be changed
         value : int
            the new sample value
         """
-        n = frameNum * self.sampleWidth * self.numChannels
+        n = index * self.sampleWidth * self.numChannels
         m = n + self.sampleWidth
         value = max(min(value, self.MAX_POS), self.MAX_NEG)
         self.buffer[n:m] = value.to_bytes(self.sampleWidth,
@@ -447,7 +415,7 @@ class Sound:
         if not self.isStereo():
             print("Sound is not stereo, cannot set left value")
         else:
-            self.setSampleValue(frameNum, value)
+            self.setSampleValueAt(frameNum, value)
 
     def setRightSample(self, frameNum, value):
         """Set the right sample value in a stereo sample

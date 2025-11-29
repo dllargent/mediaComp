@@ -220,7 +220,7 @@ class Picture:
         col = Color(rgb[0], rgb[1], rgb[2])
         self.getPixel(x,y).setColor(col)
 
-    def getPixel(self, x, y):
+    def getPixelAt(self, x, y):
         """Return the pixel at specified coordinates
 
         Parameters

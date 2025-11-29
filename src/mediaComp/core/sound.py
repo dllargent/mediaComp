@@ -143,7 +143,7 @@ def setSampleValueAt(sound, index, value) -> None:
     if index > getNumSamples(sound) - 1 + Sound._SoundIndexOffset:
         print("You are trying to access the sample at index: " + str(index) + ", but the last valid index is at " + str(getNumSamples(sound) - 1 + Sound._SoundIndexOffset))
         raise ValueError
-    sound.setSampleValue(index - Sound._SoundIndexOffset, int(value))
+    sound.setSampleValueAt(index - Sound._SoundIndexOffset, int(value))
 
 
 def getSampleValueAt(sound, index) -> int:
@@ -156,7 +156,7 @@ def getSampleValueAt(sound, index) -> int:
     if index > getNumSamples(sound) - 1 + Sound._SoundIndexOffset:
         print("You are trying to access the sample at index: " + str(index) + ", but the last valid index is at " + str(getNumSamples(sound) - 1 + Sound._SoundIndexOffset))
         raise ValueError
-    return sound.getSampleValue(index - Sound._SoundIndexOffset)
+    return sound.getSampleValueAt(index - Sound._SoundIndexOffset)
 
 
 def setSampleValue(sample, value) -> None:
