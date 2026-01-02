@@ -178,7 +178,7 @@ def getPixelAt(picture, x, y) -> Pixel:
         print("getPixelAt(picture,x,y): y (= {}) is less than {} or bigger than the height (= {})".format(y, Picture._PictureIndexOffset, getHeight(picture) - 1 + Picture._PictureIndexOffset))
         raise ValueError
 
-    return picture.getPixel(x - Picture._PictureIndexOffset, y - Picture._PictureIndexOffset)
+    return picture.getPixelAt(x - Picture._PictureIndexOffset, y - Picture._PictureIndexOffset)
 
 
 def setRed(pixel, value) -> None:
