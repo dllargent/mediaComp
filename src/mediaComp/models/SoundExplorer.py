@@ -838,8 +838,8 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         except Exception:
             sel = None
         self.index_value.config(state='normal')
-        # self.index_value.delete(0, tk.END)
-        # self.index_value.insert(0, str(cur_frame))
+        self.index_value.delete(0, tk.END)
+        self.index_value.insert(0, str(cur_frame))
         # Restore selection if user had selected text
         try:
             if sel is not None:
@@ -854,7 +854,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         
         # Try to update the value at the current sample index
         try:
-            sample = self.sound.getSample(cur_frame - self.base).getValue()
+            sample = self.sound.getSampleValueAt(cur_frame - self.base)
             self.sample_value.config(state='normal')
             self.sample_value.delete(0, tk.END)
             self.sample_value.insert(0, f"{sample:.0f}")
