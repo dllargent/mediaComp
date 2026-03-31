@@ -115,7 +115,7 @@ class SamplingPanel(tk.Frame,):
             try:
                 sample_index = int(pixel * frames_per_pixel)
                 if sample_index < sound.getLengthInFrames():
-                    sample_value = sound.getSampleValue(sample_index)
+                    sample_value = sound.getSampleValueAt(sample_index)
                     # Normalize the sample value to fit in the display
                     y = (sample_height // 2) - (sample_value * (sample_height // 2) / max_value)
                     # Clamp y to valid range
