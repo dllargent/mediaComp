@@ -258,7 +258,7 @@ class SoundExplorer(MouseMotionListener, ActionListener, MouseListener, LineList
         self.current_pixel_position: int = 0
         
         # Debug flag
-        self.debug: bool = True  # Enable debug for testing
+        self.debug: bool = False  # Enable debug for testing
         
         # Main parts of the GUI
         self.sound_frame: Optional[tk.Tk] = None
