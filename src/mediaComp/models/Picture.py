@@ -205,7 +205,7 @@ class Picture:
         tuple of int
             the color of the pixel at position (x,y) as a tuple
         """
-        return self.getPixel(x,y).getColor().getRGB()
+        return self.getPixelAt(x,y).getColor().getRGB()
 
     def setBasicPixel(self, x, y, rgb):
         """Sets the pixel at specified coordinates to a color based on rgb(tuple)
@@ -218,7 +218,7 @@ class Picture:
             the color the pixel will be set to
         """
         col = Color(rgb[0], rgb[1], rgb[2])
-        self.getPixel(x,y).setColor(col)
+        self.getPixelAt(x,y).setColor(col)
 
     def getPixelAt(self, x, y):
         """Return the pixel at specified coordinates
@@ -459,8 +459,8 @@ class Picture:
         srcHeight = self.getHeight()
         for x in range(0, srcWidth):
             for y in range(0, srcHeight):
-                srcPix = self.getPixel(x, y)
-                dstPix = dest.getPixel(x+upperLeftX, y+upperLeftY)
+                srcPix = self.getPixelAt(x, y)
+                dstPix = dest.getPixelAt(x+upperLeftX, y+upperLeftY)
                 dstPix.setColor(srcPix.getColor())
         return dest
 
