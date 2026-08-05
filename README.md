@@ -15,7 +15,7 @@ If a message like "Python 3.12.5" is displayed it means Python is installed and 
 
 To install our package run:
 
-```python -m pip install mediaComp[gui]```
+```python -m pip install mediaComp```
 
 ## Help
 
@@ -29,8 +29,7 @@ Thank you to everyone who has contributed to this library.
 - Santos Pena
 
 ## Dependencies
-MediaComp is strongly dependent on several libraries. Most of the these will install with the package, ***however*** to make sure you get wxPython with the package, install it with 
-```pip install mediaComp[gui]```.
+MediaComp is strongly dependent on several libraries. If you're struggling to install our library, ensure the following are getting installed.
 
 | Dependency | Version |
 | :-----:| :-----: |
