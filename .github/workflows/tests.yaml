@@ -30,6 +30,18 @@ jobs:
     - name: Install PyTest
       run: pip install pytest
 
+    - name: Install wxPython system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libgtk-3-dev \
+          libglib2.0-dev \
+          libnotify-dev \
+          libsdl2-dev \
+          freeglut3-dev \
+          libsm-dev \
+          libwebkit2gtk-4.1-dev
+
     - name: Install Package
       run: pip install -e .
 
