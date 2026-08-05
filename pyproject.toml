@@ -10,6 +10,7 @@ dependencies = [
   "pygame>2.5.0",
   "numpy>=2.2.1",
   "sounddevice>=0.5.2",
+  "wxPython>=4.2.0"
 ]
 authors = [
   { name="A community project", email="dllargent@bsu.edu" },
@@ -24,9 +25,6 @@ classifiers = [
 ]
 license = "GPL-3.0-or-later"
 license-files = ["LICEN[CS]E*"]
-
-[project.optional-dependencies]
-gui = ["wxPython>=4.2.0"]
 
 
 [project.urls]
