@@ -12,7 +12,8 @@
 - Make a virtual python enviornment in the repository
     - ```python -m venv dev```
 - Load into the environment
-    - ```dev/Scripts/activate```
+    - ```dev/Scripts/activate``` (for Windows)
+    - ```source dev/bin/activate``` (for MacOS)
     - You should see (dev) to the left of your terminal 
 - Install the local library in the environment
     - ```pip install -e .```
