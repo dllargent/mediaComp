@@ -4,12 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mediaComp"
-version = "0.4.13"
+version = "0.4.14"
 dependencies = [
   "pillow>11.0.0",
   "pygame>2.5.0",
   "numpy>=2.2.1",
   "sounddevice>=0.5.2",
+  "wxPython>=4.2.0"
 ]
 authors = [
   { name="A community project", email="dllargent@bsu.edu" },
@@ -17,16 +18,13 @@ authors = [
 
 description = "A multimedia processing library for Python 3."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
 license = "GPL-3.0-or-later"
 license-files = ["LICEN[CS]E*"]
-
-[project.optional-dependencies]
-gui = ["wxPython>=4.2.0"]
 
 
 [project.urls]
