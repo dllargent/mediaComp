@@ -35,7 +35,7 @@ MediaComp is strongly dependent on several libraries. If you're struggling to in
 | :-----:| :-----: |
 | wxPython | > 4.2.0 |
 | pillow | > 11.0.0 |
-| pygame | > 2.5.0 |
+| pygame-ce | > 2.5.0 |
 | numpy | >= 2.2.1 |
 | sounddevice | >= 0.5.2 |
 
