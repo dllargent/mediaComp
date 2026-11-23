@@ -3,7 +3,7 @@ from mediaComp import *
  
 def get_test_pixel():
     pic = makeEmptyPicture(1, 1)
-    return getPixel(pic, 0, 0)
+    return getPixelAt(pic, 0, 0)
 
 
 @pytest.mark.parametrize("value", [
@@ -76,9 +76,9 @@ def test_setColor_getColor(r, g, b):
     setColor(pixel, color)
 
     result = getColor(pixel)
-    assert getRed(result)   == r
-    assert getGreen(result) == g
-    assert getBlue(result)  == b
+    assert result.getRed()   == r
+    assert result.getGreen() == g
+    assert result.getBlue()  == b
 
 
  
