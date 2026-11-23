@@ -76,9 +76,9 @@ def test_setColor_getColor(r, g, b):
     setColor(pixel, color)
 
     result = getColor(pixel)
-    assert result.getRed(result)   == r
-    assert result.getGreen(result) == g
-    assert result.getBlue(result)  == b
+    assert result.getRed()   == r
+    assert result.getGreen() == g
+    assert result.getBlue()  == b
 
 
  
